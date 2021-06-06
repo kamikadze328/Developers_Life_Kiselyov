@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Developers Life</string>
+    <string name="tab_text_1">Latest</string>
+    <string name="tab_text_2">Hot</string>
+    <string name="tab_text_3">Top</string>
+    <string name="button_description_next_gif">Next gif</string>
+    <string name="button_description_prev_gif">Previous gif</string>
+    <string name="view_description_gif">current mem</string>
+    <string name="internet_problem_description">You have some internet problem</string>
+    <string name="image_download_problem_description">Can\'t load the image(</string>
+    <string name="first_image">It\'s the first mem</string>
+    <string name="no_images">There aren\'t memes</string>
+    <string name="try_again">Please, try again</string>
+
+</resources>

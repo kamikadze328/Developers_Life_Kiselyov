@@ -1,0 +1,2 @@
+rootProject.name = "Developers Life"
+include ':app'
