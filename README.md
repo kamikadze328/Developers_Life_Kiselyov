@@ -27,5 +27,5 @@ Completed task for Tinkoff Summer School 2021
 #### *Примечания к реализации:  
 +	Для работы с gif-изображениями рекомендуется использовать [Glide](https://github.com/bumptech/glide)
 +	Для получения постов необходимо использовать следующий метод:  
-  + Get https://developerslife.ru/random?ison=true  
+  + Get https://developerslife.ru/random?json=true  
 +	Для того, чтобы вам было легче справиться с заданием, ниже вы найдете примерные макеты приложения: 
