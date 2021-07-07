@@ -176,7 +176,8 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
             object : NetworkCallback() {
                 override fun onAvailable(network: Network) {
                     activity?.runOnUiThread {
-                        getNewMem()
+                        if(state == STATES.PROBLEM_INTERNET)
+                            getNewMem()
                     }
                 }
             })
@@ -191,6 +192,7 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
     private fun getCurrentMemGifUrl(): String = cache[currentImageNumber].gifURL
 
     private fun updateMemDescriptionText() {
+        Log.v("kek", "updateMemDescriptionText")
         setMemDescriptionText(getCurrentMemDescription())
         showMemDescription()
     }
@@ -245,11 +247,12 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
 
 
     private fun showMemDescription() {
-        binding.memDescriptionLayout.visibility = View.VISIBLE
+        binding.memDescription.visibility = View.VISIBLE
     }
 
     private fun hideMemDescription() {
-        binding.memDescriptionLayout.visibility = View.INVISIBLE
+        Log.v("kek", "hideMemDescription")
+        binding.memDescription.visibility = View.INVISIBLE
     }
 
     private fun hideMemDescriptionAndImage() {

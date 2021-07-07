@@ -1,57 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.main.MemLayoutFragment">
-
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
         android:layout_marginVertical="@dimen/activity_vertical_margin"
-        android:elevation="10dp"
-        app:cardCornerRadius="12dp">
+        app:cardCornerRadius="20dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <FrameLayout
             android:id="@+id/memFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context=".ui.fragments.MemFragment">
-
+            android:layout_height="match_parent">
             <ImageView
                 android:id="@+id/memImageView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/memDescriptionLayout"
                 android:contentDescription="@string/view_description_gif" />
+        </FrameLayout>
 
-            <FrameLayout
-                android:id="@+id/memDescriptionLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/shadowed_background"
-                android:elevation="10dp"
-                android:paddingTop="22dp"
-                android:paddingBottom="5dp"
-                app:layout_constraintBottom_toBottomOf="parent">
+        <TextView
+            android:id="@+id/memDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@drawable/shadowed_background"
+            android:gravity="center"
+            android:paddingVertical="10dp"
+            android:paddingHorizontal="5dp"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
 
-                <TextView
-                    android:id="@+id/memDescription"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-            </FrameLayout>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintBottom_toBottomOf="parent" />
 
 
     </androidx.cardview.widget.CardView>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
