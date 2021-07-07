@@ -1,5 +1,12 @@
 package com.kamikadze328.developerslife.ui.main
 
+import android.content.Context
+import android.content.Context.CONNECTIVITY_SERVICE
+import android.net.ConnectivityManager
+import android.net.ConnectivityManager.NetworkCallback
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -83,11 +90,13 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
             currentImageNumber = savedInstanceState.getInt(toCategoryStr(CURRENT_IMAGE_NUMBER))
             currentPage = savedInstanceState.getInt(toCategoryStr(CURRENT_PAGE))
             state = (savedInstanceState.getSerializable(toCategoryStr(STATE)) ?: state) as STATES
-            Log.v("kek$categoryNumber", "currentImageNumber - $currentImageNumber")
-            Log.v("kek$categoryNumber", "state - $state")
+            Log.d("kek$categoryNumber", "currentImageNumber - $currentImageNumber")
+            Log.d("kek$categoryNumber", "state - $state")
 
-            Log.v("kek$categoryNumber", "onCreate mem${categoryNumber}. hashCode - ${hashCode()}")
+            Log.d("kek$categoryNumber", "onCreate mem${categoryNumber}. hashCode - ${hashCode()}")
         }
+
+        context?.let { registerNetworkCallback(it) }
 
     }
 
@@ -132,8 +141,6 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
             STATES.INIT -> getNewMem()
 
             else -> updateFragmentState()
-
-
         }
     }
 
@@ -145,18 +152,34 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
         val root = binding.root
         initState()
         imageDownloadProblemFragment.addListeners(this)
-        Log.v("kek$categoryNumber", "onCreateView")
+        Log.d("kek$categoryNumber", "onCreateView")
         return root
     }
 
 
     override fun onSaveInstanceState(outState: Bundle) {
-        Log.v("kek$categoryNumber", "onSaveInstanceState mem$categoryNumber")
+        Log.d("kek$categoryNumber", "onSaveInstanceState mem$categoryNumber")
         outState.putInt(toCategoryStr(CURRENT_IMAGE_NUMBER), currentImageNumber)
         outState.putInt(toCategoryStr(CURRENT_PAGE), currentPage)
         outState.putParcelableArrayList(toCategoryStr(CACHE), cache)
         outState.putSerializable(toCategoryStr(STATE), state)
         super.onSaveInstanceState(outState)
+    }
+
+    private fun registerNetworkCallback(context: Context) {
+        val manager = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        manager.registerNetworkCallback(
+            NetworkRequest.Builder()
+                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .addTransportType(NetworkCapabilities.TRANSPORT_ETHERNET)
+                .build(),
+            object : NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    activity?.runOnUiThread {
+                        getNewMem()
+                    }
+                }
+            })
     }
 
     private fun setMemDescriptionText(text: String) {
@@ -173,7 +196,7 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     private fun updateMemImage() {
-        Log.v("kek$categoryNumber", "updateMemImage")
+        Log.d("kek$categoryNumber", "updateMemImage")
 
         showLoading()
         Glide.with(this).asGif()
@@ -186,8 +209,8 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
                     dataSource: DataSource?,
                     isFirstResource: Boolean
                 ): Boolean {
-                    Log.v("kek$categoryNumber", "onResourceReady")
-                    hideLoading()
+                    Log.d("kek$categoryNumber", "onResourceReady")
+                    hideAllProblemAndLoading()
                     resource?.start()
                     state = STATES.OK
                     return false
@@ -199,7 +222,7 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
                     target: Target<GifDrawable?>?,
                     isFirstResource: Boolean
                 ): Boolean {
-                    Log.v("kek$categoryNumber", "onLoadFailed")
+                    Log.d("kek$categoryNumber", "onLoadFailed")
                     showImageDownloadProblem()
                     return false
                 }
@@ -211,7 +234,7 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     fun updateFragmentState() {
-        Log.v("kek$categoryNumber", "updateFragmentState")
+        Log.d("kek$categoryNumber", "updateFragmentState")
         updateMemDescriptionText()
         updateMemImage()
     }
@@ -252,7 +275,7 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     private fun showLoading() {
-        Log.v("kek$categoryNumber", "showLoading - ${!loadingFragment.isAdded}")
+        Log.d("kek$categoryNumber", "showLoading - ${!loadingFragment.isAdded}")
 
         if (!loadingFragment.isAdded) {
             hideAllProblems()
@@ -263,14 +286,14 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     private fun hideLoading() {
-        Log.v("kek$categoryNumber", "hideLoading - ${loadingFragment.isAdded}")
+        Log.d("kek$categoryNumber", "hideLoading - ${loadingFragment.isAdded}")
 
         if (loadingFragment.isAdded)
             removeFragment(loadingFragment)
     }
 
     private fun showInternetProblem() {
-        Log.v("kek$categoryNumber", "showInternetProblem - ${state != STATES.PROBLEM_INTERNET}")
+        Log.d("kek$categoryNumber", "showInternetProblem - ${state != STATES.PROBLEM_INTERNET}")
 
         if (state != STATES.PROBLEM_INTERNET) {
             hideAllProblemAndLoading()
@@ -282,14 +305,14 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     private fun hideInternetProblem() {
-        Log.v("kek$categoryNumber", "hideInternetProblem - ${state == STATES.PROBLEM_INTERNET}")
+        Log.d("kek$categoryNumber", "hideInternetProblem - ${state == STATES.PROBLEM_INTERNET}")
 
         if (state == STATES.PROBLEM_INTERNET)
             removeFragment(internetProblemFragment)
     }
 
     private fun showNoMemProblem() {
-        Log.v("kek$categoryNumber", "showNoMemProblem - ${!noMemProblemFragment.isAdded}")
+        Log.d("kek$categoryNumber", "showNoMemProblem - ${!noMemProblemFragment.isAdded}")
 
         if (!noMemProblemFragment.isAdded) {
             hideAllProblemAndLoading()
@@ -302,14 +325,14 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     private fun hideNoMemProblem() {
-        Log.v("kek$categoryNumber", "hideNoMemProblem - ${noMemProblemFragment.isAdded}")
+        Log.d("kek$categoryNumber", "hideNoMemProblem - ${noMemProblemFragment.isAdded}")
 
         if (noMemProblemFragment.isAdded)
             removeFragment(noMemProblemFragment)
     }
 
     private fun showServerErrorProblem() {
-        Log.v("kek$categoryNumber", "showNoMemProblem - ${!serverProblemFragment.isAdded}")
+        Log.d("kek$categoryNumber", "showNoMemProblem - ${!serverProblemFragment.isAdded}")
 
         if (!serverProblemFragment.isAdded) {
             hideAllProblemAndLoading()
@@ -321,14 +344,14 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     private fun hideServerErrorProblem() {
-        Log.v("kek$categoryNumber", "hideNoMemProblem - ${serverProblemFragment.isAdded}")
+        Log.d("kek$categoryNumber", "hideNoMemProblem - ${serverProblemFragment.isAdded}")
 
         if (serverProblemFragment.isAdded)
             removeFragment(serverProblemFragment)
     }
 
     private fun showImageDownloadProblem() {
-        Log.v(
+        Log.d(
             "kek$categoryNumber",
             "showImageDownloadProblem - ${!imageDownloadProblemFragment.isAdded}"
         )
@@ -343,7 +366,7 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     private fun hideImageDownloadProblem() {
-        Log.v(
+        Log.d(
             "kek$categoryNumber",
             "hideImageDownloadProblem - ${imageDownloadProblemFragment.isAdded}"
         )
@@ -364,9 +387,9 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     fun nextImage() {
-        Log.v("kek$categoryNumber", "nextImage from $currentImageNumber")
+        Log.d("kek$categoryNumber", "nextImage from $currentImageNumber")
         if (cache.size != 0 && cache.size != currentImageNumber) currentImageNumber++
-        Log.v("kek$categoryNumber", "nextImage to $currentImageNumber")
+        Log.d("kek$categoryNumber", "nextImage to $currentImageNumber")
         if (cache.size > currentImageNumber) {
             updateFragmentState()
         } else {
@@ -388,20 +411,20 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     private fun getNewMem() {
-        Log.v("kek$categoryNumber", "getNewMemImage")
+        Log.d("kek$categoryNumber", "getNewMemImage")
         hideMemDescription()
         showLoading()
-        Log.v("kek$categoryNumber", "start download")
+        Log.d("kek$categoryNumber", "start download")
         downloader.getData(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.v("kek$currentImageNumber", "onFailure")
+                Log.d("kek$currentImageNumber", "onFailure")
                 activity?.runOnUiThread {
                     processInternetError()
                 }
             }
 
             override fun onResponse(call: Call, response: Response) {
-                Log.v("kek$categoryNumber", "onResponse")
+                Log.d("kek$categoryNumber", "onResponse")
 
                 activity?.runOnUiThread {
                     if (response.isSuccessful && response.body != null) {
@@ -431,7 +454,7 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     private fun processNoImagesErrorMeta() {
-        Log.v("kek", "processNoImagesErrorMeta")
+        Log.d("kek", "processNoImagesErrorMeta")
         showNoMemProblem()
         currentPage = 0
         decrementCurrentImageNumber()
