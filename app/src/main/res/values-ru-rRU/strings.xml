@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Developers Life</string>
+    <string name="app_name">Жизнь разработчика</string>
     <string name="button_description_next_gif">Следующий мем</string>
     <string name="server_error_description_problem">Похоже, у developerlife.ru какте-то проблемы</string>
     <string name="try_again">Пожалуйста, попробуйте ещё раз</string>
