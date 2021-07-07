@@ -1,7 +1,6 @@
 package com.kamikadze328.developerslife.ui.main
 
 import android.content.Context
-import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
@@ -18,7 +17,10 @@ class ScreenSlidePagerAdapter(
     override fun getItemCount(): Int = CATEGORY.values().size
 
     override fun createFragment(position: Int): Fragment {
-        val f = MemLayoutFragment.newInstance(position + 1, context.resources.getString(CATEGORY.values()[position].resourceId))
+        val f = MemLayoutFragment.newInstance(
+            position + 1,
+            context.resources.getString(CATEGORY.values()[position].resourceId)
+        )
         fragments.add(position, f)
         return f
     }
