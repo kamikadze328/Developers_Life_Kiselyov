@@ -7,6 +7,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.kamikadze328.developerslife.additional.CATEGORY
 import com.kamikadze328.developerslife.databinding.ActivityMainBinding
+import com.kamikadze328.developerslife.ui.main.MemLayoutFragment
 import com.kamikadze328.developerslife.ui.main.ScreenSlidePagerAdapter
 
 
@@ -20,7 +21,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val sectionsPagerAdapter = ScreenSlidePagerAdapter(this)
+        val sectionsPagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager, lifecycle, this)
         val viewPager: ViewPager2 = binding.viewPager
         val tabs: TabLayout = binding.tabs
 
@@ -29,12 +30,17 @@ class MainActivity : AppCompatActivity() {
             tab.text = "${CATEGORY.values()[(position)]}"
         }.attach()
 
-
+        supportFragmentManager.fragments.forEach {
+            if (it is MemLayoutFragment) {
+                sectionsPagerAdapter.fragments.add(it.categoryNumber - 1, it)
+            }
+        }
         binding.nextGifButton.setOnClickListener {
-            sectionsPagerAdapter.fragments[viewPager.currentItem].nextImage()
+            sectionsPagerAdapter.fragments[viewPager.currentItem]!!.nextImage()
         }
         binding.prevGifButton.setOnClickListener {
-            sectionsPagerAdapter.fragments[viewPager.currentItem].prevImage()
+            sectionsPagerAdapter.fragments[viewPager.currentItem]!!.prevImage()
         }
     }
+
 }

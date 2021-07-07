@@ -7,30 +7,29 @@
     android:layout_height="match_parent"
     tools:context=".ui.fragments.ImageDownloadProblemFragment">
 
-    <TextView
-        android:id="@+id/textView"
+    <ImageButton
+        android:id="@+id/imageDownloadProblemButton"
+        style="@style/MyImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/try_again"
+        android:src="@drawable/ic_baseline_refresh_50"
+        android:text="@string/try_again"
+        app:layout_constraintBottom_toTopOf="@id/imageDownloadProblemTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/imageDownloadProblemTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:text="@string/try_again"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageDownloadProblemButton"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageButton
-        android:id="@+id/imageDownloadProblemButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/button_round"
-        android:contentDescription="@string/try_again"
-        android:elevation="3dp"
-        android:src="@drawable/ic_baseline_refresh_50"
-        android:text="@string/try_again"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/imageDownloadProblemButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

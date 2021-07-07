@@ -5,11 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -20,81 +16,156 @@ import com.bumptech.glide.request.target.Target
 import com.kamikadze328.developerslife.R
 import com.kamikadze328.developerslife.additional.CATEGORY
 import com.kamikadze328.developerslife.additional.Downloader
-import com.kamikadze328.developerslife.databinding.FragmentMainBinding
+import com.kamikadze328.developerslife.additional.ImageMeta
+import com.kamikadze328.developerslife.additional.STATES
+import com.kamikadze328.developerslife.databinding.FragmentMemLaytoutBinding
 import com.kamikadze328.developerslife.ui.fragments.*
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
-import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
 
 
-/**
- * A placeholder fragment containing a simple view.
- */
 class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
-    private var _binding: FragmentMainBinding? = null
+    private var _binding: FragmentMemLaytoutBinding? = null
     private val binding get() = _binding!!
 
-    private var title: String = ""
-    private lateinit var category: CATEGORY
-    private var categoryNumber = 0
+    private var category: CATEGORY = CATEGORY.RANDOM
+    var categoryNumber = 0
 
     private var internetProblemFragment = InternetProblemFragment()
-    private val imageDownloadProblemFragment = ImageDownloadProblemFragment()
-    private var memFragment = MemFragment()
-    private val loadingFragment = LoadingFragment()
+    private var imageDownloadProblemFragment = ImageDownloadProblemFragment()
+    private var loadingFragment = LoadingFragment()
+    private var noMemProblemFragment = NoMemProblemFragment()
+    private var serverProblemFragment = ServerProblemFragment()
+
     private var downloader = Downloader()
 
-    private val cache = mutableListOf<JSONObject>()
+    private var cache = ArrayList<ImageMeta>()
     private var currentImageNumber = 0
     private var currentPage = 0
 
+    private var state: STATES = STATES.INIT
+
+
+    companion object {
+        private const val ARG_SECTION_NUMBER = "section_number"
+        private const val ARG_SECTION_TITLE = "section_title"
+
+        private const val CACHE = "cache"
+        private const val STATE = "state"
+        private const val CURRENT_IMAGE_NUMBER = "current_image_number"
+        private const val CURRENT_PAGE = "current_page"
+
+
+        @JvmStatic
+        fun newInstance(sectionNumber: Int, sectionTitle: String): MemLayoutFragment {
+            return MemLayoutFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(ARG_SECTION_NUMBER, sectionNumber)
+                    putString(ARG_SECTION_TITLE, sectionTitle)
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         categoryNumber = arguments?.getInt(ARG_SECTION_NUMBER) ?: 0
-        title = arguments?.getString(ARG_SECTION_TITLE).toString()
-        category = CATEGORY.fromString(title) ?: CATEGORY.RANDOM
+        arguments?.getString(ARG_SECTION_TITLE)?.let {
+            category = CATEGORY.fromString(it) ?: category
+        }
+
+        if (savedInstanceState != null) {
+            cache = savedInstanceState.getParcelableArrayList(toCategoryStr(CACHE)) ?: cache
+            currentImageNumber = savedInstanceState.getInt(toCategoryStr(CURRENT_IMAGE_NUMBER))
+            currentPage = savedInstanceState.getInt(toCategoryStr(CURRENT_PAGE))
+            state = (savedInstanceState.getSerializable(toCategoryStr(STATE)) ?: state) as STATES
+            Log.v("kek$categoryNumber", "currentImageNumber - $currentImageNumber")
+            Log.v("kek$categoryNumber", "state - $state")
+
+            Log.v("kek$categoryNumber", "onCreate mem${categoryNumber}. hashCode - ${hashCode()}")
+        }
+
+    }
+
+    private fun initState() {
+        when (state) {
+            STATES.LOADING -> childFragmentManager.findFragmentByTag(
+                getFragmentTag(loadingFragment)
+            )?.let {
+                loadingFragment = it as LoadingFragment
+                if (currentImageNumber < cache.size) updateFragmentState()
+                else getNewMem()
+            }
+
+            STATES.PROBLEM_IMAGE_DOWNLOAD -> childFragmentManager.findFragmentByTag(
+                getFragmentTag(imageDownloadProblemFragment)
+            )?.let {
+                imageDownloadProblemFragment = it as ImageDownloadProblemFragment
+                updateMemDescriptionText()
+            }
+
+            STATES.PROBLEM_NO_MEM -> childFragmentManager.findFragmentByTag(
+                getFragmentTag(noMemProblemFragment)
+            )?.let {
+                noMemProblemFragment = it as NoMemProblemFragment
+                hideMemDescription()
+            }
+
+            STATES.PROBLEM_INTERNET -> childFragmentManager.findFragmentByTag(
+                getFragmentTag(internetProblemFragment)
+            )?.let {
+                internetProblemFragment = it as InternetProblemFragment
+                hideMemDescription()
+            }
+
+            STATES.PROBLEM_SERVER_ERROR -> childFragmentManager.findFragmentByTag(
+                getFragmentTag(serverProblemFragment)
+            )?.let {
+                serverProblemFragment = it as ServerProblemFragment
+                hideMemDescription()
+            }
+
+            STATES.INIT -> getNewMem()
+
+            else -> updateFragmentState()
+
+
+        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentMainBinding.inflate(inflater, container, false)
+    ): View {
+        _binding = FragmentMemLaytoutBinding.inflate(inflater, container, false)
         val root = binding.root
+        initState()
         imageDownloadProblemFragment.addListeners(this)
         Log.v("kek$categoryNumber", "onCreateView")
         return root
     }
 
 
-    override fun onStart() {
-        super.onStart()
-        getNewMemImage()
+    override fun onSaveInstanceState(outState: Bundle) {
+        Log.v("kek$categoryNumber", "onSaveInstanceState mem$categoryNumber")
+        outState.putInt(toCategoryStr(CURRENT_IMAGE_NUMBER), currentImageNumber)
+        outState.putInt(toCategoryStr(CURRENT_PAGE), currentPage)
+        outState.putParcelableArrayList(toCategoryStr(CACHE), cache)
+        outState.putSerializable(toCategoryStr(STATE), state)
+        super.onSaveInstanceState(outState)
     }
 
     private fun setMemDescriptionText(text: String) {
-        view?.findViewById<TextView>(R.id.memDescription)?.text = text
+        binding.memDescription.text = text
     }
 
-    private fun getCurrentMemDescription(): String {
-        return try {
-            cache[currentImageNumber].getString("description")
-        } catch (e: JSONException) {
-            ""
-        }
-    }
+    private fun getCurrentMemDescription(): String = cache[currentImageNumber].description
 
-    private fun getCurrentMemGifUrl(): String {
-        return try {
-            cache[currentImageNumber].getString("gifURL")
-        } catch (e: JSONException) {
-            ""
-        }
-    }
+    private fun getCurrentMemGifUrl(): String = cache[currentImageNumber].gifURL
 
     private fun updateMemDescriptionText() {
         setMemDescriptionText(getCurrentMemDescription())
@@ -102,44 +173,45 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     private fun updateMemImage() {
-        val imageView = view?.findViewById<ImageView>(R.id.currentMem)
-        if (imageView != null) {
-            showLoading()
-            Glide.with(this).asGif()
-                /*.onlyRetrieveFromCache(true)*/
-                .listener(object : RequestListener<GifDrawable?> {
-                    override fun onResourceReady(
-                        resource: GifDrawable?,
-                        model: Any?,
-                        target: Target<GifDrawable?>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        hideLoading()
-                        hideImageDownloadProblem()
-                        resource?.start()
-                        return false
-                    }
+        Log.v("kek$categoryNumber", "updateMemImage")
 
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<GifDrawable?>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        hideLoading()
-                        showImageDownloadProblem()
-                        return false
-                    }
-                })
-                .load(getCurrentMemGifUrl())
-                .fitCenter()
-                .into(imageView)
-        }
+        showLoading()
+        Glide.with(this).asGif()
+            /*.onlyRetrieveFromCache(true)*/
+            .listener(object : RequestListener<GifDrawable?> {
+                override fun onResourceReady(
+                    resource: GifDrawable?,
+                    model: Any?,
+                    target: Target<GifDrawable?>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    Log.v("kek$categoryNumber", "onResourceReady")
+                    hideLoading()
+                    resource?.start()
+                    state = STATES.OK
+                    return false
+                }
+
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<GifDrawable?>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    Log.v("kek$categoryNumber", "onLoadFailed")
+                    showImageDownloadProblem()
+                    return false
+                }
+            })
+            .load(getCurrentMemGifUrl())
+            .fitCenter()
+            .into(binding.memImageView)
+
     }
 
     fun updateFragmentState() {
-        switchToMemFragment()
+        Log.v("kek$categoryNumber", "updateFragmentState")
         updateMemDescriptionText()
         updateMemImage()
     }
@@ -148,91 +220,158 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
         if (currentImageNumber != 0) currentImageNumber--
     }
 
-    private fun isLoadingFragmentExists(): Boolean {
-        return view?.findViewById<FrameLayout>(R.id.loadingFragment) != null
-    }
-
-    private fun isInternetProblemFragmentExists(): Boolean {
-        return view?.findViewById<ConstraintLayout>(R.id.internetProblemFragment) != null
-    }
-
-    private fun isMemFragmentExists(): Boolean {
-        return view?.findViewById<ConstraintLayout>(R.id.memFragment) != null
-    }
-
-    private fun isImageDownloadProblemFragmentExists(): Boolean {
-        return imageDownloadProblemFragment.isAdded
-    }
 
     private fun showMemDescription() {
-        view?.findViewById<FrameLayout>(R.id.memDescriptionLayout)?.visibility = View.VISIBLE
+        binding.memDescriptionLayout.visibility = View.VISIBLE
     }
 
     private fun hideMemDescription() {
-        switchToMemFragment()
-        view?.findViewById<FrameLayout>(R.id.memDescriptionLayout)?.visibility = View.INVISIBLE
-
+        binding.memDescriptionLayout.visibility = View.INVISIBLE
     }
 
-    private fun switchToInternetProblemFragment() {
-        if (!isInternetProblemFragmentExists()) {
-            val transaction = childFragmentManager.beginTransaction()
-            if (isMemFragmentExists()) {
-                transaction.remove(memFragment)
-            }
-            transaction.add(R.id.frame, internetProblemFragment).commitNow()
-        }
-        setMemDescriptionText("")
+    private fun hideMemDescriptionAndImage() {
+        hideMemDescription()
+        hideMemImage()
     }
 
-    private fun switchToMemFragment() {
-        if (!isMemFragmentExists()) {
-            val transaction = childFragmentManager.beginTransaction()
-            if (isInternetProblemFragmentExists()) {
-                transaction.remove(internetProblemFragment)
-            }
-            transaction.add(R.id.frame, memFragment).commitNow()
-        }
+
+    private fun hideMemImage() {
+        binding.memImageView.setImageDrawable(null)
+    }
+
+    private fun hideAllProblemAndLoading() {
+        hideLoading()
+        hideAllProblems()
+    }
+
+    private fun hideAllProblems() {
+        hideImageDownloadProblem()
+        hideNoMemProblem()
+        hideInternetProblem()
+        hideServerErrorProblem()
     }
 
     private fun showLoading() {
-        switchToMemFragment()
-        if (!isLoadingFragmentExists()) {
-            childFragmentManager.beginTransaction()
-                .add(R.id.memFragment, loadingFragment).commitNow()
+        Log.v("kek$categoryNumber", "showLoading - ${!loadingFragment.isAdded}")
+
+        if (!loadingFragment.isAdded) {
+            hideAllProblems()
+            addFragment(loadingFragment)
+
+            state = STATES.LOADING
         }
     }
 
     private fun hideLoading() {
-        if (isLoadingFragmentExists()) {
-            childFragmentManager.beginTransaction()
-                .remove(loadingFragment).commitNow()
+        Log.v("kek$categoryNumber", "hideLoading - ${loadingFragment.isAdded}")
+
+        if (loadingFragment.isAdded)
+            removeFragment(loadingFragment)
+    }
+
+    private fun showInternetProblem() {
+        Log.v("kek$categoryNumber", "showInternetProblem - ${state != STATES.PROBLEM_INTERNET}")
+
+        if (state != STATES.PROBLEM_INTERNET) {
+            hideAllProblemAndLoading()
+            hideMemDescriptionAndImage()
+            addFragment(internetProblemFragment)
+
+            state = STATES.PROBLEM_INTERNET
         }
     }
 
+    private fun hideInternetProblem() {
+        Log.v("kek$categoryNumber", "hideInternetProblem - ${state == STATES.PROBLEM_INTERNET}")
+
+        if (state == STATES.PROBLEM_INTERNET)
+            removeFragment(internetProblemFragment)
+    }
+
+    private fun showNoMemProblem() {
+        Log.v("kek$categoryNumber", "showNoMemProblem - ${!noMemProblemFragment.isAdded}")
+
+        if (!noMemProblemFragment.isAdded) {
+            hideAllProblemAndLoading()
+
+            hideMemDescriptionAndImage()
+            addFragment(noMemProblemFragment)
+
+            state = STATES.PROBLEM_NO_MEM
+        }
+    }
+
+    private fun hideNoMemProblem() {
+        Log.v("kek$categoryNumber", "hideNoMemProblem - ${noMemProblemFragment.isAdded}")
+
+        if (noMemProblemFragment.isAdded)
+            removeFragment(noMemProblemFragment)
+    }
+
+    private fun showServerErrorProblem() {
+        Log.v("kek$categoryNumber", "showNoMemProblem - ${!serverProblemFragment.isAdded}")
+
+        if (!serverProblemFragment.isAdded) {
+            hideAllProblemAndLoading()
+            hideMemDescriptionAndImage()
+            addFragment(serverProblemFragment)
+
+            state = STATES.PROBLEM_SERVER_ERROR
+        }
+    }
+
+    private fun hideServerErrorProblem() {
+        Log.v("kek$categoryNumber", "hideNoMemProblem - ${serverProblemFragment.isAdded}")
+
+        if (serverProblemFragment.isAdded)
+            removeFragment(serverProblemFragment)
+    }
+
     private fun showImageDownloadProblem() {
-        switchToMemFragment()
-        hideImageDownloadProblem()
-        if (!isImageDownloadProblemFragmentExists()) {
-            childFragmentManager.beginTransaction()
-                .add(R.id.memFragment, imageDownloadProblemFragment).commitNow()
+        Log.v(
+            "kek$categoryNumber",
+            "showImageDownloadProblem - ${!imageDownloadProblemFragment.isAdded}"
+        )
+
+        if (!imageDownloadProblemFragment.isAdded) {
+            hideAllProblemAndLoading()
+            hideMemImage()
+            addFragment(imageDownloadProblemFragment)
+
+            state = STATES.PROBLEM_IMAGE_DOWNLOAD
         }
     }
 
     private fun hideImageDownloadProblem() {
-        if (isImageDownloadProblemFragmentExists()) {
-            childFragmentManager.beginTransaction()
-                .remove(imageDownloadProblemFragment).commitNow()
-        }
+        Log.v(
+            "kek$categoryNumber",
+            "hideImageDownloadProblem - ${imageDownloadProblemFragment.isAdded}"
+        )
+
+        if (imageDownloadProblemFragment.isAdded)
+            removeFragment(imageDownloadProblemFragment)
+    }
+
+    private fun addFragment(fr: Fragment) {
+        childFragmentManager.beginTransaction()
+            .add(R.id.memFragment, fr, getFragmentTag(fr))
+            .commitNow()
+    }
+
+    private fun removeFragment(fr: Fragment) {
+        childFragmentManager.beginTransaction()
+            .remove(fr).commitNow()
     }
 
     fun nextImage() {
+        Log.v("kek$categoryNumber", "nextImage from $currentImageNumber")
         if (cache.size != 0 && cache.size != currentImageNumber) currentImageNumber++
+        Log.v("kek$categoryNumber", "nextImage to $currentImageNumber")
         if (cache.size > currentImageNumber) {
             updateFragmentState()
         } else {
             if (category != CATEGORY.RANDOM && cache.size != 0) currentPage++
-            getNewMemImage()
+            getNewMem()
         }
     }
 
@@ -248,71 +387,70 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
         }
     }
 
-    private fun getNewMemImage() {
+    private fun getNewMem() {
+        Log.v("kek$categoryNumber", "getNewMemImage")
         hideMemDescription()
         showLoading()
+        Log.v("kek$categoryNumber", "start download")
         downloader.getData(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
+                Log.v("kek$currentImageNumber", "onFailure")
                 activity?.runOnUiThread {
-                    processDownloadErrorMeta()
+                    processInternetError()
                 }
             }
 
             override fun onResponse(call: Call, response: Response) {
+                Log.v("kek$categoryNumber", "onResponse")
+
                 activity?.runOnUiThread {
-                    switchToMemFragment()
                     if (response.isSuccessful && response.body != null) {
                         processResponse(JSONObject(response.body!!.string()))
                         if (cache.size > 0) updateFragmentState()
                         else processNoImagesErrorMeta()
-                    } else processDownloadErrorMeta()
+                    } else processServerError()
                 }
             }
         }, category, currentPage)
     }
 
-    fun processDownloadErrorMeta() {
+    private fun processDownloadMetaError() {
         if (cache.size <= currentImageNumber) currentImageNumber = cache.size + 1
         decrementCurrentImageNumber()
         if (category != CATEGORY.RANDOM) if (currentPage != 0) currentPage--
-        hideLoading()
-        switchToInternetProblemFragment()
     }
 
-    fun processNoImagesErrorMeta() {
-        //TODO normal error
-        hideLoading()
-        setMemDescriptionText(getString(R.string.no_images))
+    private fun processInternetError() {
+        processDownloadMetaError()
+        showInternetProblem()
+    }
+
+    private fun processServerError() {
+        processDownloadMetaError()
+        showServerErrorProblem()
+    }
+
+    private fun processNoImagesErrorMeta() {
+        Log.v("kek", "processNoImagesErrorMeta")
+        showNoMemProblem()
         currentPage = 0
         decrementCurrentImageNumber()
     }
 
     fun processResponse(json: JSONObject) {
         if (category == CATEGORY.RANDOM) {
-            cache.add(json)
+            cache.add(ImageMeta.jsonObjectToImageMeta(json))
         } else {
             val jsonArray = json.getJSONArray("result")
             for (i in 0 until jsonArray.length()) {
-                cache.add(jsonArray.getJSONObject(i))
-            }
-        }
-
-    }
-
-    companion object {
-        private const val ARG_SECTION_NUMBER = "section_number"
-        private const val ARG_SECTION_TITLE = "section_title"
-
-        @JvmStatic
-        fun newInstance(sectionNumber: Int, sectionTitle: String): MemLayoutFragment {
-            return MemLayoutFragment().apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_SECTION_NUMBER, sectionNumber)
-                    putString(ARG_SECTION_TITLE, sectionTitle)
-                }
+                cache.add(ImageMeta.jsonObjectToImageMeta(jsonArray.getJSONObject(i)))
             }
         }
     }
+
+    private fun getFragmentTag(fr: Fragment) = "${fr.javaClass.simpleName}$currentPage"
+
+    private fun toCategoryStr(str: String) = str + categoryNumber.toString()
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -320,6 +458,6 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     override fun imageDownloadProblemClicked() {
-        updateMemImage()
+        updateFragmentState()
     }
 }

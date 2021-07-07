@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.kamikadze328.developerslife.R
 
-class MemFragment : Fragment() {
+class ServerProblemFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_mem, container, false)
+        return inflater.inflate(R.layout.fragment_server_problem, container, false)
     }
 }

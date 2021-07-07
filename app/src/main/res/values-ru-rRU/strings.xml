@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Developers Life</string>
+    <string name="button_description_next_gif">Следующий мем</string>
+    <string name="server_error_description_problem">Похоже, у developerlife.ru какте-то проблемы</string>
+    <string name="try_again">Пожалуйста, попробуйте ещё раз</string>
+    <string name="first_image">Это первый мем</string>
+    <string name="no_images_problem_description">Здесь нет мемов</string>
+    <string name="image_download_problem_description">Не получается загрузить изображение</string>
+    <string name="internet_problem_description">Похоже, какие-то проблемы с интернетом</string>
+    <string name="view_description_gif">текущий мем</string>
+    <string name="button_description_prev_gif">Предыдущий мем</string>
+    <string name="hot">Горячие</string>
+    <string name="top">Лучшие</string>
+    <string name="latest">Последние</string>
+    <string name="random">Случайные</string>
+</resources>

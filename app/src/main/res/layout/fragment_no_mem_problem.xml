@@ -1,33 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/internetProblemFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragments.InternetProblemFragment">
+    tools:context=".ui.fragments.NoMemProblemFragment"
+    android:id="@+id/noMemProblem">
 
     <ImageView
-        android:id="@+id/internetProblemImage"
+        android:id="@+id/noMemProblemImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:contentDescription="@string/internet_problem_description"
-        android:src="@drawable/ic_baseline_cloud_off_50"
-        app:layout_constraintBottom_toTopOf="@id/internetProblemText"
+        android:contentDescription="@string/no_images_problem_description"
+        android:src="@drawable/ic_baseline_image_not_supported_50"
+        app:layout_constraintBottom_toTopOf="@+id/noMemProblemText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintVertical_chainStyle="packed"/>
 
     <TextView
-        android:id="@+id/internetProblemText"
+        android:id="@+id/noMemProblemText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/internet_problem_description"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/no_images_problem_description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/internetProblemImage" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/noMemProblemImage" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
