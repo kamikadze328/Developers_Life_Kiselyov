@@ -17,6 +17,7 @@
             android:id="@+id/memFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <ImageView
                 android:id="@+id/memImageView"
                 android:layout_width="match_parent"
@@ -31,8 +32,8 @@
             android:layout_gravity="bottom"
             android:background="@drawable/shadowed_background"
             android:gravity="center"
-            android:paddingVertical="10dp"
             android:paddingHorizontal="5dp"
+            android:paddingVertical="10dp"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"

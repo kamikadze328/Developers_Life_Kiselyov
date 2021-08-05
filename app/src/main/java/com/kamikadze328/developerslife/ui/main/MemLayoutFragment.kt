@@ -176,7 +176,7 @@ class MemLayoutFragment : Fragment(), ImageDownloadProblemClickedListener {
             object : NetworkCallback() {
                 override fun onAvailable(network: Network) {
                     activity?.runOnUiThread {
-                        if(state == STATES.PROBLEM_INTERNET)
+                        if (state == STATES.PROBLEM_INTERNET)
                             getNewMem()
                     }
                 }
