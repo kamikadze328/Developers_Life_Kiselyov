@@ -6,13 +6,12 @@ Completed test task for Tinkoff Summer School 2021
   
 ## Android app (Kotlin)
 ![Developers life promoution image](https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/0_main_image.png)
-![Mem 1 image](https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/1_mem_1.jpg)
-![Mem 2 image](https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/2_mem_2.jpg)
-![Mem 3 image](https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/3_mem_3.jpg)
-![No internet state image](https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/4_no_internet.jpg)
-![Internet problem state image](https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/5_internet_problem.jpg)
-![Loading state image](https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/6_loading.jpg)
-
+<img alt="Mem 1 image" src="https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/1_mem_1.jpg" width="350">
+<img alt="Mem 2 image" src="https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/2_mem_2.jpg" width="350">
+<img alt="Mem 3 image" src="https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/3_mem_3.jpg" width="350">
+<img alt="No internet state image" src="https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/4_no_internet.jpg" width="350">
+<img alt="Internet problem state image" src="https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/5_internet_problem.jpg" width="350">
+<img alt="Loading state image" src="https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/6_loading.jpg" width="350">  
 
 ## Android Developer, Сириус 2021  
 ### Вам предлагается написать Android-приложение, обладающее следующим минимальным функционалом:  
