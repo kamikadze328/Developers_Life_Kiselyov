@@ -1,6 +1,6 @@
 # Kiselyov_Developers_Life
-Completed task for Tinkoff Summer School 2021
-## Лабораторная работа.
+Completed test task for Tinkoff Summer School 2021
+
 ## Android Developer, Сириус 2021  
 ### Вам предлагается написать Android-приложение, обладающее следующим минимальным функционалом:  
 1. На главном экране приложения отображается gif-изображение вместе с его описанием, полученным с сайта developerslife.ru (детали работы с API — ниже)*  
