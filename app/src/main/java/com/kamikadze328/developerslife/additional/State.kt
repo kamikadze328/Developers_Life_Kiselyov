@@ -1,6 +1,6 @@
 package com.kamikadze328.developerslife.additional
 
-enum class STATES {
+enum class State {
     INIT,
     LOADING,
     PROBLEM_INTERNET,

@@ -21,8 +21,8 @@ class Downloader {
     }
 
 
-    fun getData(callback: Callback, category: CATEGORY, page: Int = 0) {
-        val isRandom = category == CATEGORY.RANDOM
+    fun getData(callback: Callback, category: Category, page: Int = 0) {
+        val isRandom = category == Category.RANDOM
         val categoryStr = category.urlParam
         val url = createUrl(categoryStr, page, isRandom)
         makeRequest(url, callback)

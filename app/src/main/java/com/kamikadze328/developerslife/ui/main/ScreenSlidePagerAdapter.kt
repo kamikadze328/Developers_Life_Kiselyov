@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.kamikadze328.developerslife.additional.CATEGORY
+import com.kamikadze328.developerslife.additional.Category
 
 class ScreenSlidePagerAdapter(
     fragmentManager: FragmentManager,
@@ -13,13 +13,13 @@ class ScreenSlidePagerAdapter(
     var context: Context
 ) : FragmentStateAdapter(fragmentManager, lifecycle) {
 
-    val fragments: MutableList<MemLayoutFragment?> = MutableList(itemCount) { null }
-    override fun getItemCount(): Int = CATEGORY.values().size
+    val fragments: MutableList<MemFragment?> = MutableList(itemCount) { null }
+    override fun getItemCount(): Int = Category.values().size
 
     override fun createFragment(position: Int): Fragment {
-        val f = MemLayoutFragment.newInstance(
+        val f = MemFragment.newInstance(
             position + 1,
-            context.resources.getString(CATEGORY.values()[position].resourceId)
+            context.resources.getString(Category.values()[position].resourceId)
         )
         fragments.add(position, f)
         return f
