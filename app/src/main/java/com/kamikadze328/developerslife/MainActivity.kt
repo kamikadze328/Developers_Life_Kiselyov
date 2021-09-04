@@ -5,9 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.kamikadze328.developerslife.additional.CATEGORY
+import com.kamikadze328.developerslife.additional.Category
 import com.kamikadze328.developerslife.databinding.ActivityMainBinding
-import com.kamikadze328.developerslife.ui.main.MemLayoutFragment
+import com.kamikadze328.developerslife.ui.main.MemFragment
 import com.kamikadze328.developerslife.ui.main.ScreenSlidePagerAdapter
 
 
@@ -27,11 +27,11 @@ class MainActivity : AppCompatActivity() {
 
         viewPager.adapter = sectionsPagerAdapter
         TabLayoutMediator(tabs, viewPager) { tab, position ->
-            tab.text = "${CATEGORY.values()[(position)]}"
+            tab.text = "${Category.values()[(position)]}"
         }.attach()
 
         supportFragmentManager.fragments.forEach {
-            if (it is MemLayoutFragment) {
+            if (it is MemFragment) {
                 sectionsPagerAdapter.fragments.add(it.categoryNumber - 1, it)
             }
         }
