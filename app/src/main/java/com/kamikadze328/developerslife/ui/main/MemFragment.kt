@@ -24,7 +24,7 @@ import com.kamikadze328.developerslife.R
 import com.kamikadze328.developerslife.additional.Category
 import com.kamikadze328.developerslife.additional.ImageMeta
 import com.kamikadze328.developerslife.additional.State
-import com.kamikadze328.developerslife.databinding.FragmentMemLaytoutBinding
+import com.kamikadze328.developerslife.databinding.FragmentMemBinding
 import com.kamikadze328.developerslife.ui.fragments.*
 import okhttp3.Call
 import okhttp3.Callback
@@ -33,7 +33,7 @@ import org.json.JSONObject
 import java.io.IOException
 
 class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
-    private var _binding: FragmentMemLaytoutBinding? = null
+    private var _binding: FragmentMemBinding? = null
     private val binding get() = _binding!!
 
     private var category: Category? = null
