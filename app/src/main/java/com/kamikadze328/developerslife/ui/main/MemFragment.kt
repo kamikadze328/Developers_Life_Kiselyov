@@ -140,7 +140,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentMemLaytoutBinding.inflate(inflater, container, false)
+        _binding = FragmentMemBinding.inflate(inflater, container, false)
         val root = binding.root
         initState()
         imageDownloadProblemFragment.addListeners(this)
