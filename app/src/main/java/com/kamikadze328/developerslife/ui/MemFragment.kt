@@ -26,7 +26,6 @@ import com.kamikadze328.developerslife.data.ImageMeta
 import com.kamikadze328.developerslife.data.State
 import com.kamikadze328.developerslife.databinding.FragmentMemBinding
 import com.kamikadze328.developerslife.ui.data.ImageDownloadProblemClickedListener
-import com.kamikadze328.developerslife.ui.fragments.*
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response

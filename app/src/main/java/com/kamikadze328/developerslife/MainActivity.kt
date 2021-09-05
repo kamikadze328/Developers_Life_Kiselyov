@@ -5,10 +5,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.kamikadze328.developerslife.adapter.ScreenSlidePagerAdapter
 import com.kamikadze328.developerslife.data.Category
 import com.kamikadze328.developerslife.databinding.ActivityMainBinding
 import com.kamikadze328.developerslife.ui.MemFragment
-import com.kamikadze328.developerslife.adapter.ScreenSlidePagerAdapter
 
 
 class MainActivity : AppCompatActivity() {
