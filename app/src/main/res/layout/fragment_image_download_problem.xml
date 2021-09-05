@@ -5,7 +5,7 @@
     android:id="@+id/imageDownloadProblemFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragments.ImageDownloadProblemFragment">
+    tools:context=".ui.ImageDownloadProblemFragment">
 
     <ImageButton
         android:id="@+id/imageDownloadProblemButton"

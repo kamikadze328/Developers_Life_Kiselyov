@@ -1,4 +1,4 @@
-package com.kamikadze328.developerslife.ui.main
+package com.kamikadze328.developerslife.adapter
 
 import android.content.Context
 import androidx.fragment.app.Fragment
@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.kamikadze328.developerslife.data.Category
+import com.kamikadze328.developerslife.ui.MemFragment
 
 class ScreenSlidePagerAdapter(
     fragmentManager: FragmentManager,

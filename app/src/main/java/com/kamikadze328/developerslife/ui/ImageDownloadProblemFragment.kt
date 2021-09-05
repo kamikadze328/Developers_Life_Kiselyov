@@ -1,10 +1,11 @@
-package com.kamikadze328.developerslife.ui.fragments
+package com.kamikadze328.developerslife.ui
 
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import com.kamikadze328.developerslife.R
+import com.kamikadze328.developerslife.ui.data.ImageDownloadProblemClickedListener
 
 
 class ImageDownloadProblemFragment : Fragment(R.layout.fragment_image_download_problem) {

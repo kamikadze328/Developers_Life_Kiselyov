@@ -1,4 +1,4 @@
-package com.kamikadze328.developerslife.ui.main
+package com.kamikadze328.developerslife.ui
 
 import android.content.Context
 import android.content.Context.CONNECTIVITY_SERVICE
@@ -25,6 +25,7 @@ import com.kamikadze328.developerslife.data.Category
 import com.kamikadze328.developerslife.data.ImageMeta
 import com.kamikadze328.developerslife.data.State
 import com.kamikadze328.developerslife.databinding.FragmentMemBinding
+import com.kamikadze328.developerslife.ui.data.ImageDownloadProblemClickedListener
 import com.kamikadze328.developerslife.ui.fragments.*
 import okhttp3.Call
 import okhttp3.Callback

@@ -7,8 +7,8 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.kamikadze328.developerslife.data.Category
 import com.kamikadze328.developerslife.databinding.ActivityMainBinding
-import com.kamikadze328.developerslife.ui.main.MemFragment
-import com.kamikadze328.developerslife.ui.main.ScreenSlidePagerAdapter
+import com.kamikadze328.developerslife.ui.MemFragment
+import com.kamikadze328.developerslife.adapter.ScreenSlidePagerAdapter
 
 
 class MainActivity : AppCompatActivity() {
