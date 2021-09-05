@@ -1,4 +1,4 @@
-package com.kamikadze328.developerslife.additional
+package com.kamikadze328.developerslife.data
 
 import com.kamikadze328.developerslife.R
 

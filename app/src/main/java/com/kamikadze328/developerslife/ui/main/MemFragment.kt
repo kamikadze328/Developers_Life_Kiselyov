@@ -21,9 +21,9 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.kamikadze328.developerslife.App
 import com.kamikadze328.developerslife.R
-import com.kamikadze328.developerslife.additional.Category
-import com.kamikadze328.developerslife.additional.ImageMeta
-import com.kamikadze328.developerslife.additional.State
+import com.kamikadze328.developerslife.data.Category
+import com.kamikadze328.developerslife.data.ImageMeta
+import com.kamikadze328.developerslife.data.State
 import com.kamikadze328.developerslife.databinding.FragmentMemBinding
 import com.kamikadze328.developerslife.ui.fragments.*
 import okhttp3.Call
@@ -87,8 +87,6 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
             currentPage = savedInstanceState.getInt(toCategoryStr(CURRENT_PAGE))
             state = (savedInstanceState.getSerializable(toCategoryStr(STATE)) ?: state) as State
         }
-
-        registerNetworkCallback(requireContext())
     }
 
 
@@ -141,10 +139,14 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMemBinding.inflate(inflater, container, false)
-        val root = binding.root
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         initState()
+        registerNetworkCallback(requireContext())
         imageDownloadProblemFragment.addListeners(this)
-        return root
     }
 
 

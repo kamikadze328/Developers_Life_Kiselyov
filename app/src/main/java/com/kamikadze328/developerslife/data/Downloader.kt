@@ -1,4 +1,4 @@
-package com.kamikadze328.developerslife.additional
+package com.kamikadze328.developerslife.data
 
 import okhttp3.Callback
 import okhttp3.OkHttpClient

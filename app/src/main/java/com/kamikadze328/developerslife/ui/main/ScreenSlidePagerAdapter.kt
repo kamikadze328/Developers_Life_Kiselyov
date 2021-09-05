@@ -5,12 +5,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.kamikadze328.developerslife.additional.Category
+import com.kamikadze328.developerslife.data.Category
 
 class ScreenSlidePagerAdapter(
     fragmentManager: FragmentManager,
     lifecycle: Lifecycle,
-    var context: Context
+    val context: Context
 ) : FragmentStateAdapter(fragmentManager, lifecycle) {
 
     val fragments: MutableList<MemFragment?> = MutableList(itemCount) { null }
