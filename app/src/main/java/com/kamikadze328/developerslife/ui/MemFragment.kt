@@ -2,23 +2,31 @@ package com.kamikadze328.developerslife.ui
 
 import android.content.Context
 import android.content.Context.CONNECTIVITY_SERVICE
+import android.content.res.ColorStateList
+import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.ConnectivityManager.NetworkCallback
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.request.transition.Transition
 import com.kamikadze328.developerslife.App
 import com.kamikadze328.developerslife.R
 import com.kamikadze328.developerslife.data.Category
@@ -26,11 +34,13 @@ import com.kamikadze328.developerslife.data.ImageMeta
 import com.kamikadze328.developerslife.data.State
 import com.kamikadze328.developerslife.databinding.FragmentMemBinding
 import com.kamikadze328.developerslife.ui.data.ImageDownloadProblemClickedListener
+import jp.wasabeef.glide.transformations.BlurTransformation
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
+
 
 class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
     private var _binding: FragmentMemBinding? = null
@@ -41,12 +51,12 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
 
     private var internetProblemFragment = InternetProblemFragment()
     private var imageDownloadProblemFragment = ImageDownloadProblemFragment()
-    private var loadingFragment = LoadingFragment()
     private var noMemProblemFragment = NoMemProblemFragment()
     private var serverProblemFragment = ServerProblemFragment()
 
 
     private var cache = ArrayList<ImageMeta>()
+    private val currentMem: ImageMeta get() = cache[currentImageNumber]
     private var currentImageNumber = 0
     private var currentPage = 0
 
@@ -92,10 +102,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
 
     private fun initState() {
         when (state) {
-            State.LOADING -> childFragmentManager.findFragmentByTag(
-                getFragmentTag(loadingFragment)
-            )?.let {
-                loadingFragment = it as LoadingFragment
+            State.LOADING -> {
                 if (currentImageNumber < cache.size) updateFragmentState()
                 else getNewMem()
             }
@@ -179,21 +186,48 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
             getNewMem()
     }
 
-    private fun setMemDescriptionText(text: String) {
-        binding.memDescription.text = text
-    }
-
-    private fun getCurrentMemDescription(): String = cache[currentImageNumber].description
-
-    private fun getCurrentMemGifUrl(): String = cache[currentImageNumber].gifURL
+    private fun isCurrentMemHasGif(): Boolean = currentMem.gifURL.isNotBlank()
 
     private fun updateMemDescriptionText() {
-        setMemDescriptionText(getCurrentMemDescription())
+        binding.memDescription.text = currentMem.description
         showMemDescription()
     }
 
-    private fun updateMemImage() {
+    private fun updateMemRatingText() {
+        showMemRating()
+
+        binding.memRating.text = currentMem.votes.toString()
+        val color = ContextCompat.getColor(
+            requireContext(),
+            if (currentMem.votes < 0) R.color.orange else R.color.green
+        )
+        ImageViewCompat.setImageTintList(binding.memRatingImage, ColorStateList.valueOf(color))
+    }
+
+    private fun updateMemImageWithPreview() {
         showLoading()
+        Glide.with(this)
+            .load(currentMem.previewURL)
+            .apply(RequestOptions.bitmapTransform(BlurTransformation(10)))
+            .into(object : CustomTarget<Drawable>() {
+                override fun onResourceReady(
+                    resource: Drawable,
+                    transition: Transition<in Drawable>?
+                ) {
+                    if (isCurrentMemHasGif()) updateMemGifImage(resource)
+                    else updateMemImage(resource)
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {}
+            })
+    }
+
+    private fun updateMemImage(image: Drawable) {
+        Glide.with(this).load(image).into(binding.memImageView)
+    }
+
+    private fun updateMemGifImage(placeholder: Drawable? = null) {
+        if (placeholder == null) showLoading()
         Glide.with(this).asGif()
             /*.onlyRetrieveFromCache(true)*/
             .listener(object : RequestListener<GifDrawable?> {
@@ -220,24 +254,36 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
                     return false
                 }
             })
-            .load(getCurrentMemGifUrl())
+            .load(currentMem.gifURL)
+            .placeholder(placeholder)
             .fitCenter()
             .into(binding.memImageView)
-
     }
 
     fun updateFragmentState() {
+        Log.d("kek", "updateFragmentState")
+        Log.d("kek", "$currentImageNumber")
+        Log.d("kek", "${cache.size}")
+
         updateMemDescriptionText()
-        updateMemImage()
+        updateMemRatingText()
+        updateMemImageWithPreview()
     }
 
     private fun decrementCurrentImageNumber() {
         if (currentImageNumber != 0) currentImageNumber--
     }
 
-
     private fun showMemDescription() {
         binding.memDescription.visibility = View.VISIBLE
+    }
+
+    private fun hideMemRating() {
+        binding.memRating.visibility = View.INVISIBLE
+    }
+
+    private fun showMemRating() {
+        binding.memRating.visibility = View.VISIBLE
     }
 
     private fun hideMemDescription() {
@@ -267,17 +313,13 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     private fun showLoading() {
-        if (!loadingFragment.isAdded) {
-            hideAllProblems()
-            addFragment(loadingFragment)
-
-            state = State.LOADING
-        }
+        hideAllProblems()
+        binding.loading.visibility = View.VISIBLE
+        state = State.LOADING
     }
 
     private fun hideLoading() {
-        if (loadingFragment.isAdded)
-            removeFragment(loadingFragment)
+        binding.loading.visibility = View.GONE
     }
 
     private fun showInternetProblem() {
@@ -353,11 +395,13 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     fun nextImage() {
+        Log.d("kek", "next image")
         if (cache.size != 0 && cache.size != currentImageNumber) currentImageNumber++
         if (cache.size > currentImageNumber) {
             updateFragmentState()
         } else {
             if (category != Category.RANDOM && cache.size != 0) currentPage++
+            Log.d("kek", "new mem image")
             getNewMem()
         }
     }
@@ -375,6 +419,8 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     private fun getNewMem() {
+        Log.d("kek", "getNewMem")
+        hideMemImage()
         hideMemDescription()
         showLoading()
         (requireActivity().application as App).downloader.getData(object : Callback {
@@ -387,7 +433,11 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
             override fun onResponse(call: Call, response: Response) {
                 activity?.runOnUiThread {
                     if (response.isSuccessful && response.body != null) {
-                        processResponse(JSONObject(response.body!!.string()))
+                        val jsonObj = JSONObject(response.body!!.string())
+                        if (!processResponse(jsonObj)) {
+                            processInternetError()
+                            return@runOnUiThread
+                        }
                         if (cache.size > 0) updateFragmentState()
                         else processNoImagesErrorMeta()
                     } else processServerError()
@@ -418,14 +468,19 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
         decrementCurrentImageNumber()
     }
 
-    fun processResponse(json: JSONObject) {
+    fun processResponse(json: JSONObject): Boolean {
+        Log.d("kek", "processResponse")
         if (category == Category.RANDOM) {
-            cache.add(ImageMeta.jsonObjectToImageMeta(json))
+            Log.d("kek", "${ImageMeta.jsonObjectToImageMeta(json)}")
+            val imageMeta = ImageMeta.jsonObjectToImageMeta(json)
+            if (imageMeta.gifURL.isEmpty()) return false
+            return cache.add(imageMeta)
         } else {
             val jsonArray = json.getJSONArray("result")
             for (i in 0 until jsonArray.length()) {
                 cache.add(ImageMeta.jsonObjectToImageMeta(jsonArray.getJSONObject(i)))
             }
+            return true
         }
     }
 
