@@ -9,4 +9,12 @@
         <item name="android:elevation">@dimen/button_elevation</item>
         <item name="android:background">@drawable/button_round</item>
     </style>
+
+    <style name="AboutTheme">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColorLink">@color/design_default_color_primary</item>
+        <item name="android:textColor">@color/design_default_color_secondary</item>
+        <item name="android:textSize">@dimen/about_text</item>
+        <item name="android:layout_margin">20dp</item>
+    </style>
 </resources>

@@ -11,6 +11,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.kamikadze328.developerslife.adapter.ScreenSlidePagerAdapter
 import com.kamikadze328.developerslife.data.Category
 import com.kamikadze328.developerslife.databinding.ActivityMainBinding
+import com.kamikadze328.developerslife.ui.AboutActivity
 import com.kamikadze328.developerslife.ui.MemFragment
 import com.kamikadze328.developerslife.ui.SettingsActivity
 
@@ -44,7 +45,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.about -> {
-
+                startActivity(Intent(this, AboutActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)

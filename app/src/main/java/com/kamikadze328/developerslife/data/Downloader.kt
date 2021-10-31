@@ -6,14 +6,16 @@ import okhttp3.Request
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
+private const val CONNECT_TIMEOUT = 1000L
+private const val CALL_TIMEOUT = 2000L
 
 class Downloader {
     private val defaultUrl = "https://developerslife.ru/"
     private val parameters = "?json=true"
 
     private val okHttpClient = OkHttpClient.Builder()
-        .connectTimeout(1000, TimeUnit.MILLISECONDS)
-        .callTimeout(2000, TimeUnit.MILLISECONDS)
+        .connectTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
+        .callTimeout(CALL_TIMEOUT, TimeUnit.MILLISECONDS)
         .build()
 
     private fun createUrl(category: String, page: Int = 0, isRandom: Boolean): URL {
@@ -35,4 +37,6 @@ class Downloader {
         okHttpClient.newCall(request)
             .enqueue(callback)
     }
+
+    fun getMemUrl(memId: Int) = defaultUrl + memId.toString()
 }

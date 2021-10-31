@@ -28,10 +28,12 @@
         <activity
             android:name=".ui.SettingsActivity"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.DevelopersLife.NoActionBar">
+            android:label="@string/settings" />
+        <activity
+            android:name=".ui.AboutActivity"
+            android:exported="true"
+            android:label="@string/about" />
 
-        </activity>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

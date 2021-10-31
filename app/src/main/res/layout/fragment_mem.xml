@@ -26,15 +26,25 @@
 
             <TextView
                 android:id="@+id/memRating"
-                android:text=""
-                tools:text="46"
-                android:layout_margin="@dimen/corner_radius"
-                android:textSize="18sp"
-                android:textStyle="bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="@dimen/corner_radius"
                 android:drawablePadding="5dp"
-                app:drawableLeftCompat="@drawable/ic_baseline_thumbs_up_down_20" />
+                android:text=""
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:drawableLeftCompat="@drawable/ic_baseline_thumbs_up_down_20"
+                tools:text="46" />
+
+            <ImageView
+                android:id="@+id/open"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:contentDescription="@string/open"
+                android:paddingTop="@dimen/corner_radius"
+                android:paddingEnd="@dimen/corner_radius"
+                android:src="@drawable/ic_baseline_open_in_new_24" />
 
             <ProgressBar
                 android:id="@+id/loading"

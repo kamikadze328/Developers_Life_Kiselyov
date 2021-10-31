@@ -19,4 +19,12 @@
     <string name="hide_rating_text">Скрывать рейтинг мема</string>
     <string name="button_description_share_gif">Поделиться</string>
     <string name="is_too_early_sharing_problem_description">Мем ещё не загружен</string>
+
+    <string name="title_activity_about">О нас</string>
+    <string name="privacy_policy_ref"><a href="https://kamikadze328.me/developerslife/privacy_policy/index.html">Политика конфиденциальности</a></string>
+    <string name="app_version">Версия %1$s (%2$d)</string>
+    <string name="open">Открыть мем на developerslife.ru</string>
+
+    <string name="text_copied">Ссылка (%1$s) скопирована</string>
+
 </resources>

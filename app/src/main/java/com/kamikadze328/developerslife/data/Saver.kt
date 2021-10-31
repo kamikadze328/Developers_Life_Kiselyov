@@ -9,7 +9,7 @@ import java.io.File
 import java.nio.ByteBuffer
 
 
-fun saveImage(gifDrawable: GifDrawable, context: Context): Uri {
+fun saveGif(gifDrawable: GifDrawable, context: Context): Uri {
     val baseDir = context.externalCacheDir
     val fileName = "sharingGif.gif"
 

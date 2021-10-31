@@ -1,5 +1,7 @@
 package com.kamikadze328.developerslife.ui
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Context.CONNECTIVITY_SERVICE
 import android.content.Intent
@@ -28,10 +30,7 @@ import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.kamikadze328.developerslife.App
 import com.kamikadze328.developerslife.R
-import com.kamikadze328.developerslife.data.Category
-import com.kamikadze328.developerslife.data.ImageMeta
-import com.kamikadze328.developerslife.data.State
-import com.kamikadze328.developerslife.data.saveImage
+import com.kamikadze328.developerslife.data.*
 import com.kamikadze328.developerslife.databinding.FragmentMemBinding
 import com.kamikadze328.developerslife.ui.data.ImageDownloadProblemClickedListener
 import jp.wasabeef.glide.transformations.BlurTransformation
@@ -54,6 +53,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
     private var noMemProblemFragment = NoMemProblemFragment()
     private var serverProblemFragment = ServerProblemFragment()
 
+    private val downloader: Downloader get() = (requireActivity().application as App).downloader
 
     private var cache = ArrayList<ImageMeta>()
     private val currentMem: ImageMeta get() = cache[currentImageNumber]
@@ -173,7 +173,31 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
         super.onViewCreated(view, savedInstanceState)
         initState()
         registerNetworkCallback(requireContext())
+
+        setupOpenLinkListener()
         imageDownloadProblemFragment.addListeners(this)
+    }
+
+    private fun setupOpenLinkListener() {
+        binding.open.setOnClickListener {
+            currentMemSafe?.let {
+                val url = downloader.getMemUrl(it.id)
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                startActivity(browserIntent)
+            }
+        }
+        binding.open.setOnLongClickListener {
+            currentMemSafe?.let {
+                val url = downloader.getMemUrl(it.id)
+                val clipboard =
+                    requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("developerslive.ru", url)
+                clipboard.setPrimaryClip(clip)
+
+                Toast.makeText(requireContext(), getString(R.string.text_copied, url), Toast.LENGTH_LONG).show()
+            }
+            true
+        }
     }
 
 
@@ -270,6 +294,10 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
                     target: Target<GifDrawable?>?,
                     isFirstResource: Boolean
                 ): Boolean {
+                    Log.d("kek", "${e?.toString()}")
+                    e?.printStackTrace()
+                    Log.d("kek", "${e?.stackTraceToString()}")
+
                     showImageDownloadProblem()
                     return false
                 }
@@ -288,6 +316,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
         updateMemDescriptionText()
         updateMemRatingText()
         updateMemImageWithPreview()
+        showLink()
     }
 
     private fun decrementCurrentImageNumber() {
@@ -317,6 +346,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
         hideMemDescription()
         hideMemImage()
         hideMemRating()
+        hideLink()
     }
 
 
@@ -344,6 +374,14 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
 
     private fun hideLoading() {
         binding.loading.visibility = View.GONE
+    }
+
+    private fun showLink() {
+        binding.open.visibility = View.VISIBLE
+    }
+
+    private fun hideLink() {
+        binding.open.visibility = View.GONE
     }
 
     private fun showInternetProblem() {
@@ -446,7 +484,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
         Log.d("kek", "getNewMem")
         hideMemDescriptionAndImage()
         showLoading()
-        (requireActivity().application as App).downloader.getData(object : Callback {
+        downloader.getData(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 activity?.runOnUiThread {
                     processInternetError()
@@ -509,12 +547,16 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
 
     private fun showSharingProblem(isTooEarly: Boolean = false) {
         val textId =
-            if (isTooEarly) R.string.is_too_early_sharing_problem_description else R.string.no_images_problem_description
-        Toast.makeText(
+            if (isTooEarly) R.string.is_too_early_sharing_problem_description
+            else R.string.no_images_problem_description
+        val toast = Toast.makeText(
             requireContext(),
             resources.getText(textId),
             Toast.LENGTH_SHORT
-        ).show()
+        )
+        activity?.runOnUiThread {
+            toast.show()
+        }
     }
 
     fun shareImage() {
@@ -544,8 +586,8 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
                         isFirstResource: Boolean
                     ): Boolean {
                         resource?.let { gif ->
-                            val uri = saveImage(gif, requireContext())
-                            shareFile(uri)
+                            val uri = saveGif(gif, requireContext())
+                            shareCurrentGif(uri)
                         }
                         return false
                     }
@@ -555,7 +597,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
         }
     }
 
-    private fun shareFile(uri: Uri) {
+    private fun shareCurrentGif(uri: Uri) {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "image/gif"
             putExtra(Intent.EXTRA_STREAM, uri)
