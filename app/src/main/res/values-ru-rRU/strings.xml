@@ -14,4 +14,7 @@
     <string name="top">Лучшие</string>
     <string name="latest">Последние</string>
     <string name="random">Случайные</string>
+    <string name="settings">Настройки</string>
+    <string name="about">О приложении</string>
+    <string name="hide_rating_text">Скрывать рейтинг мема</string>
 </resources>

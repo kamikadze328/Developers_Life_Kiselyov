@@ -24,28 +24,17 @@
                 android:layout_height="match_parent"
                 android:contentDescription="@string/view_description_gif" />
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/memRating"
+                android:text=""
+                tools:text="46"
                 android:layout_margin="@dimen/corner_radius"
+                android:textSize="18sp"
+                android:textStyle="bold"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:id="@+id/memRatingImage"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_baseline_thumbs_up_down_24"
-                    android:layout_width="wrap_content"
-                    android:layout_marginEnd="5dp"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:id="@+id/memRating"
-                    android:text=""
-                    tools:text="46"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                android:drawablePadding="5dp"
+                app:drawableLeftCompat="@drawable/ic_baseline_thumbs_up_down_24" />
 
             <ProgressBar
                 android:id="@+id/loading"

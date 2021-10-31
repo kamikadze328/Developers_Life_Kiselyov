@@ -16,8 +16,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.widget.ImageViewCompat
+import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -66,10 +67,10 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
         private const val ARG_SECTION_NUMBER = "section_number"
         private const val ARG_SECTION_TITLE = "section_title"
 
-        private const val CACHE = "cache"
-        private const val STATE = "state"
-        private const val CURRENT_IMAGE_NUMBER = "current_image_number"
-        private const val CURRENT_PAGE = "current_page"
+        private const val CACHE_KEY = "cache"
+        private const val STATE_KEY = "state"
+        private const val CURRENT_IMAGE_NUMBER_KEY = "current_image_number"
+        private const val CURRENT_PAGE_KEY = "current_page"
 
 
         @JvmStatic
@@ -92,10 +93,10 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
         } ?: Category.RANDOM
 
         if (savedInstanceState != null) {
-            cache = savedInstanceState.getParcelableArrayList(toCategoryStr(CACHE)) ?: cache
-            currentImageNumber = savedInstanceState.getInt(toCategoryStr(CURRENT_IMAGE_NUMBER))
-            currentPage = savedInstanceState.getInt(toCategoryStr(CURRENT_PAGE))
-            state = (savedInstanceState.getSerializable(toCategoryStr(STATE)) ?: state) as State
+            cache = savedInstanceState.getParcelableArrayList(toCategoryStr(CACHE_KEY)) ?: cache
+            currentImageNumber = savedInstanceState.getInt(toCategoryStr(CURRENT_IMAGE_NUMBER_KEY))
+            currentPage = savedInstanceState.getInt(toCategoryStr(CURRENT_PAGE_KEY))
+            state = (savedInstanceState.getSerializable(toCategoryStr(STATE_KEY)) ?: state) as State
         }
     }
 
@@ -146,7 +147,20 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMemBinding.inflate(inflater, container, false)
+
         return binding.root
+    }
+
+    private fun setupRatingVisibility() {
+        if (binding.memRating.visibility == View.VISIBLE && doHideRatings())
+            binding.memRating.visibility = View.INVISIBLE
+        else if (binding.memRating.visibility != View.VISIBLE && !doHideRatings() && state == State.OK)
+            binding.memRating.visibility = View.VISIBLE
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setupRatingVisibility()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -158,10 +172,10 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
 
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt(toCategoryStr(CURRENT_IMAGE_NUMBER), currentImageNumber)
-        outState.putInt(toCategoryStr(CURRENT_PAGE), currentPage)
-        outState.putParcelableArrayList(toCategoryStr(CACHE), cache)
-        outState.putSerializable(toCategoryStr(STATE), state)
+        outState.putInt(toCategoryStr(CURRENT_IMAGE_NUMBER_KEY), currentImageNumber)
+        outState.putInt(toCategoryStr(CURRENT_PAGE_KEY), currentPage)
+        outState.putParcelableArrayList(toCategoryStr(CACHE_KEY), cache)
+        outState.putSerializable(toCategoryStr(STATE_KEY), state)
         super.onSaveInstanceState(outState)
     }
 
@@ -201,7 +215,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
             requireContext(),
             if (currentMem.votes < 0) R.color.orange else R.color.green
         )
-        ImageViewCompat.setImageTintList(binding.memRatingImage, ColorStateList.valueOf(color))
+        TextViewCompat.setCompoundDrawableTintList(binding.memRating, ColorStateList.valueOf(color))
     }
 
     private fun updateMemImageWithPreview() {
@@ -283,8 +297,11 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     private fun showMemRating() {
-        binding.memRating.visibility = View.VISIBLE
+        binding.memRating.visibility = if (doHideRatings()) View.INVISIBLE else View.VISIBLE
     }
+
+    private fun doHideRatings() = PreferenceManager.getDefaultSharedPreferences(context)
+        .getBoolean(resources.getString(R.string.hide_rating_key), false)
 
     private fun hideMemDescription() {
         binding.memDescription.visibility = View.INVISIBLE
@@ -293,6 +310,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
     private fun hideMemDescriptionAndImage() {
         hideMemDescription()
         hideMemImage()
+        hideMemRating()
     }
 
 
@@ -420,8 +438,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
 
     private fun getNewMem() {
         Log.d("kek", "getNewMem")
-        hideMemImage()
-        hideMemDescription()
+        hideMemDescriptionAndImage()
         showLoading()
         (requireActivity().application as App).downloader.getData(object : Callback {
             override fun onFailure(call: Call, e: IOException) {

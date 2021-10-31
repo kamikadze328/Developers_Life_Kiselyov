@@ -15,4 +15,10 @@
     <string name="first_image">It\'s the first mem</string>
     <string name="try_again">Please, try again</string>
     <string name="server_error_description_problem">developerlife.ru has some problems</string>
+
+    <string name="settings">Settings</string>
+    <string name="about">About</string>
+
+    <string name="hide_rating_key" translatable="false">hide_rating</string>
+    <string name="hide_rating_text">Hide mem rating</string>
 </resources>

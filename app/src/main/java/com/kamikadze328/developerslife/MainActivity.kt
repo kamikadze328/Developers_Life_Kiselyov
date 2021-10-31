@@ -1,6 +1,9 @@
 package com.kamikadze328.developerslife
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
@@ -9,11 +12,13 @@ import com.kamikadze328.developerslife.adapter.ScreenSlidePagerAdapter
 import com.kamikadze328.developerslife.data.Category
 import com.kamikadze328.developerslife.databinding.ActivityMainBinding
 import com.kamikadze328.developerslife.ui.MemFragment
+import com.kamikadze328.developerslife.ui.SettingsActivity
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var sectionsPagerAdapter: ScreenSlidePagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,7 +26,33 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val sectionsPagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager, lifecycle, this)
+        setSupportActionBar(binding.toolbar)
+
+        setupPagerAdapter()
+        setupButtons()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.settings, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.settings -> {
+                startActivity(Intent(this, SettingsActivity::class.java))
+                true
+            }
+            R.id.about -> {
+
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun setupPagerAdapter() {
+        sectionsPagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager, lifecycle, this)
         val viewPager: ViewPager2 = binding.viewPager
         val tabs: TabLayout = binding.tabs
 
@@ -35,12 +66,15 @@ class MainActivity : AppCompatActivity() {
                 sectionsPagerAdapter.fragments.add(it.categoryNumber - 1, it)
             }
         }
-        binding.nextGifButton.setOnClickListener {
-            sectionsPagerAdapter.fragments[viewPager.currentItem]!!.nextImage()
-        }
-        binding.prevGifButton.setOnClickListener {
-            sectionsPagerAdapter.fragments[viewPager.currentItem]!!.prevImage()
-        }
     }
 
+    fun setupButtons() {
+
+        binding.nextGifButton.setOnClickListener {
+            sectionsPagerAdapter.fragments[binding.viewPager.currentItem]!!.nextImage()
+        }
+        binding.prevGifButton.setOnClickListener {
+            sectionsPagerAdapter.fragments[binding.viewPager.currentItem]!!.prevImage()
+        }
+    }
 }
