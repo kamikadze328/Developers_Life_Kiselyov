@@ -2,7 +2,6 @@ package com.kamikadze328.developerslife.data
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.core.content.FileProvider
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.kamikadze328.developerslife.BuildConfig
@@ -13,9 +12,6 @@ import java.nio.ByteBuffer
 fun saveImage(gifDrawable: GifDrawable, context: Context): Uri {
     val baseDir = context.externalCacheDir
     val fileName = "sharingGif.gif"
-    Log.d("kek1", "${context.cacheDir.absolutePath}")
-    Log.d("kek2", "${context.externalCacheDir?.absolutePath}")
-    Log.d("kek3", "${context.filesDir.absolutePath}")
 
     val sharingGifFile = File(baseDir, fileName)
     gifDrawableToFile(gifDrawable, sharingGifFile)
