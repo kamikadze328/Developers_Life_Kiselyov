@@ -42,24 +42,29 @@
         app:layout_constraintTop_toBottomOf="@id/appBarLayout">
 
         <ImageButton
+            android:id="@+id/shareGifButton"
+            style="@style/MyImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/button_description_next_gif"
+            android:src="@drawable/ic_baseline_share"
+            app:layout_constraintBottom_toTopOf="@id/prevGifButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="spread" />
+
+        <ImageButton
             android:id="@+id/prevGifButton"
             style="@style/MyImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/button_description_prev_gif"
             android:src="@drawable/ic_baseline_history_50"
-            app:layout_constraintBottom_toTopOf="@id/spaceBetweenButtons"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <Space
-            android:id="@+id/spaceBetweenButtons"
-            android:layout_width="wrap_content"
-            android:layout_height="20dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/nextGifButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/shareGifButton" />
 
         <ImageButton
             android:id="@+id/nextGifButton"
@@ -68,9 +73,10 @@
             android:layout_height="wrap_content"
             android:contentDescription="@string/button_description_next_gif"
             android:src="@drawable/ic_baseline_arrow_forward_50"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/spaceBetweenButtons" />
+            app:layout_constraintTop_toBottomOf="@id/prevGifButton" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

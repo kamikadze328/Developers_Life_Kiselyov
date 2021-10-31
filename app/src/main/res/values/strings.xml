@@ -5,12 +5,15 @@
     <string name="top">Top</string>
     <string name="hot">Hot</string>
 
-    <string name="button_description_next_gif">Next gif</string>
-    <string name="button_description_prev_gif">Previous gif</string>
+    <string name="button_description_next_gif">Next mem</string>
+    <string name="button_description_prev_gif">Previous mem</string>
+    <string name="button_description_share_gif">Share</string>
+
     <string name="view_description_gif">Current mem</string>
     <string name="internet_problem_description">You have some internet problem</string>
     <string name="image_download_problem_description">Can\'t load the image(</string>
     <string name="no_images_problem_description">There aren\'t any memes</string>
+    <string name="is_too_early_sharing_problem_description">Mem haven\'t loaded yet</string>
 
     <string name="first_image">It\'s the first mem</string>
     <string name="try_again">Please, try again</string>

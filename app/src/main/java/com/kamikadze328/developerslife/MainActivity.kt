@@ -76,5 +76,8 @@ class MainActivity : AppCompatActivity() {
         binding.prevGifButton.setOnClickListener {
             sectionsPagerAdapter.fragments[binding.viewPager.currentItem]!!.prevImage()
         }
+        binding.shareGifButton.setOnClickListener {
+            sectionsPagerAdapter.fragments[binding.viewPager.currentItem]!!.shareImage()
+        }
     }
 }

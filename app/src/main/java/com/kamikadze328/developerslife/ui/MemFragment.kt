@@ -2,13 +2,11 @@ package com.kamikadze328.developerslife.ui
 
 import android.content.Context
 import android.content.Context.CONNECTIVITY_SERVICE
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
-import android.net.ConnectivityManager
+import android.net.*
 import android.net.ConnectivityManager.NetworkCallback
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -33,6 +31,7 @@ import com.kamikadze328.developerslife.R
 import com.kamikadze328.developerslife.data.Category
 import com.kamikadze328.developerslife.data.ImageMeta
 import com.kamikadze328.developerslife.data.State
+import com.kamikadze328.developerslife.data.saveImage
 import com.kamikadze328.developerslife.databinding.FragmentMemBinding
 import com.kamikadze328.developerslife.ui.data.ImageDownloadProblemClickedListener
 import jp.wasabeef.glide.transformations.BlurTransformation
@@ -58,6 +57,13 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
 
     private var cache = ArrayList<ImageMeta>()
     private val currentMem: ImageMeta get() = cache[currentImageNumber]
+    private val currentMemSafe: ImageMeta?
+        get() = try {
+            currentMem
+        } catch (e: IndexOutOfBoundsException) {
+            null
+        }
+
     private var currentImageNumber = 0
     private var currentPage = 0
 
@@ -501,6 +507,65 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
         }
     }
 
+    private fun showSharingProblem(isTooEarly: Boolean = false) {
+        val textId =
+            if (isTooEarly) R.string.is_too_early_sharing_problem_description else R.string.no_images_problem_description
+        Toast.makeText(
+            requireContext(),
+            resources.getText(textId),
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    fun shareImage() {
+        val curMem = currentMemSafe
+        if (curMem == null)
+            showSharingProblem()
+        else {
+            Glide.with(this)
+                .asGif()
+                .onlyRetrieveFromCache(true)
+                .addListener(object : RequestListener<GifDrawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<GifDrawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        showSharingProblem(true)
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: GifDrawable?,
+                        model: Any?,
+                        target: Target<GifDrawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        resource?.let { gif ->
+                            val uri = saveImage(gif, requireContext())
+                            shareFile(uri)
+                        }
+                        return false
+                    }
+                })
+                .load(curMem.gifURL)
+                .submit()
+        }
+    }
+
+    private fun shareFile(uri: Uri) {
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "image/gif"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(Intent.EXTRA_TEXT, currentMem.description)
+        }
+
+        startActivity(Intent.createChooser(shareIntent, null))
+    }
+
+
     private fun getFragmentTag(fr: Fragment) = "${fr.javaClass.simpleName}$currentPage"
 
     private fun toCategoryStr(str: String) = str + categoryNumber.toString()
@@ -513,4 +578,6 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
     override fun imageDownloadProblemClicked() {
         updateFragmentState()
     }
+
+
 }

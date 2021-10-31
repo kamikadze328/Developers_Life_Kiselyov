@@ -34,7 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawablePadding="5dp"
-                app:drawableLeftCompat="@drawable/ic_baseline_thumbs_up_down_24" />
+                app:drawableLeftCompat="@drawable/ic_baseline_thumbs_up_down_20" />
 
             <ProgressBar
                 android:id="@+id/loading"

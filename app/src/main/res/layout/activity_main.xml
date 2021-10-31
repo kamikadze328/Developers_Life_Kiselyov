@@ -52,17 +52,11 @@
             android:contentDescription="@string/button_description_prev_gif"
             android:src="@drawable/ic_baseline_history_50"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/spaceBetweenButtons"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Space
-            android:id="@+id/spaceBetweenButtons"
-            android:layout_width="20dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/nextGifButton"
+            app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
 
         <ImageButton
             android:id="@+id/nextGifButton"
@@ -72,7 +66,20 @@
             android:contentDescription="@string/button_description_next_gif"
             android:src="@drawable/ic_baseline_arrow_forward_50"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/spaceBetweenButtons"
+            app:layout_constraintEnd_toStartOf="@id/shareGifButton"
+            app:layout_constraintStart_toEndOf="@id/prevGifButton"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/shareGifButton"
+            style="@style/MyImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/button_description_next_gif"
+            android:src="@drawable/ic_baseline_share"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/nextGifButton"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
