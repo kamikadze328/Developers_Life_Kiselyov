@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable
 import android.net.*
 import android.net.ConnectivityManager.NetworkCallback
 import android.os.Bundle
+import android.os.Parcel
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -41,6 +42,8 @@ import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
 
+
+private const val max_cache_size = 100
 
 class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions {
     private var _binding: FragmentMemBinding? = null
@@ -97,12 +100,28 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
         }
 
         if (savedInstanceState != null) {
-
-            cache = savedInstanceState.getParcelableArrayList(toCategoryStr(CACHE_KEY)) ?: cache
-            currentImageNumber = savedInstanceState.getInt(toCategoryStr(CURRENT_IMAGE_NUMBER_KEY))
-            currentPage = savedInstanceState.getInt(toCategoryStr(CURRENT_PAGE_KEY))
-            state = (savedInstanceState.getSerializable(toCategoryStr(STATE_KEY)) ?: state) as State
+            cache = savedInstanceState.getParcelableArrayList(CACHE_KEY) ?: cache
+            currentImageNumber = savedInstanceState.getInt(CURRENT_IMAGE_NUMBER_KEY)
+            currentPage = savedInstanceState.getInt(CURRENT_PAGE_KEY)
+            state = (savedInstanceState.getSerializable(STATE_KEY) ?: state) as State
+            Log.d(
+                "kek",
+                "size of cache(${cache.size}) - ${
+                    android.text.format.Formatter.formatFileSize(
+                        requireContext(),
+                        getBundleSizeInBytes(savedInstanceState)
+                    )
+                }"
+            )
         }
+    }
+
+    fun getBundleSizeInBytes(bundle: Bundle): Long {
+        val parcel = Parcel.obtain()
+        parcel.writeValue(bundle)
+        val bytes = parcel.marshall()
+        parcel.recycle()
+        return bytes.size.toLong()
     }
 
 
@@ -205,10 +224,10 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
 
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt(toCategoryStr(CURRENT_IMAGE_NUMBER_KEY), currentImageNumber)
-        outState.putInt(toCategoryStr(CURRENT_PAGE_KEY), currentPage)
-        outState.putParcelableArrayList(toCategoryStr(CACHE_KEY), cache)
-        outState.putSerializable(toCategoryStr(STATE_KEY), state)
+        outState.putInt(CURRENT_IMAGE_NUMBER_KEY, currentImageNumber)
+        outState.putInt(CURRENT_PAGE_KEY, currentPage)
+        outState.putParcelableArrayList(CACHE_KEY, cache)
+        outState.putSerializable(STATE_KEY, state)
         super.onSaveInstanceState(outState)
     }
 
@@ -545,15 +564,16 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
             Log.d("kek", "${ImageMeta.jsonObjectToImageMeta(json)}")
             val imageMeta = ImageMeta.jsonObjectToImageMeta(json)
             if (imageMeta.gifURL.isEmpty()) return false
-            return cache.add(imageMeta)
+            return cache.safelyAdd(imageMeta)
         } else {
             val jsonArray = json.getJSONArray("result")
             for (i in 0 until jsonArray.length()) {
-                cache.add(ImageMeta.jsonObjectToImageMeta(jsonArray.getJSONObject(i)))
+                cache.safelyAdd(ImageMeta.jsonObjectToImageMeta(jsonArray.getJSONObject(i)))
             }
             return true
         }
     }
+
 
     private fun showSharingProblem(isTooEarly: Boolean = false) {
         val textId =
@@ -624,8 +644,6 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
 
     private fun getFragmentTag(fr: Fragment) = "${fr.javaClass.simpleName}$currentPage"
 
-    private fun toCategoryStr(str: String) = str + category.id.toString()
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -650,5 +668,11 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
         }
     }
 
-
+    private fun <T> ArrayList<T>.safelyAdd(element: T): Boolean {
+        if (size == max_cache_size) {
+            removeAt(0)
+            currentImageNumber--
+        }
+        return add(element)
+    }
 }
