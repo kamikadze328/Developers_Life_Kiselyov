@@ -2,6 +2,7 @@ package com.kamikadze328.developerslife
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -48,11 +49,20 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this, AboutActivity::class.java))
                 true
             }
+            R.id.clear_mem_history -> {
+                Log.d("kek", "clearAll - ${sectionsPagerAdapter.fragments.size}")
+
+                sectionsPagerAdapter.fragments.forEach {
+                    it?.clearHistory()
+                }
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
     private fun setupPagerAdapter() {
+        Log.d("kek", "setupPagerAdapter")
         sectionsPagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager, lifecycle, this)
         val viewPager: ViewPager2 = binding.viewPager
         val tabs: TabLayout = binding.tabs
@@ -62,23 +72,26 @@ class MainActivity : AppCompatActivity() {
             tab.text = "${Category.values()[(position)]}"
         }.attach()
 
+
+        //for activity recreate
+        sectionsPagerAdapter.fragments.clear()
         supportFragmentManager.fragments.forEach {
             if (it is MemFragment) {
-                sectionsPagerAdapter.fragments.add(it.categoryNumber - 1, it)
+                Log.d("kek", "added - ${it.category}")
+                sectionsPagerAdapter.fragments.add(it.category.id, it)
             }
         }
     }
 
-    fun setupButtons() {
-
+    private fun setupButtons() {
         binding.nextGifButton.setOnClickListener {
-            sectionsPagerAdapter.fragments[binding.viewPager.currentItem]!!.nextImage()
+            sectionsPagerAdapter.fragments[binding.viewPager.currentItem]?.next()
         }
         binding.prevGifButton.setOnClickListener {
-            sectionsPagerAdapter.fragments[binding.viewPager.currentItem]!!.prevImage()
+            sectionsPagerAdapter.fragments[binding.viewPager.currentItem]?.prev()
         }
         binding.shareGifButton.setOnClickListener {
-            sectionsPagerAdapter.fragments[binding.viewPager.currentItem]!!.shareImage()
+            sectionsPagerAdapter.fragments[binding.viewPager.currentItem]?.share()
         }
     }
 }

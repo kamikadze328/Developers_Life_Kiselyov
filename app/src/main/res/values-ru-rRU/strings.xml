@@ -16,6 +16,7 @@
     <string name="random">Случайные</string>
     <string name="settings">Настройки</string>
     <string name="about">О приложении</string>
+    <string name="clear_mem_history">Очистить историю</string>
     <string name="hide_rating_text">Скрывать рейтинг мема</string>
     <string name="button_description_share_gif">Поделиться</string>
     <string name="is_too_early_sharing_problem_description">Мем ещё не загружен</string>

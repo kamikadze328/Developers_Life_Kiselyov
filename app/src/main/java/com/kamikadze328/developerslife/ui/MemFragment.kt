@@ -33,6 +33,7 @@ import com.kamikadze328.developerslife.R
 import com.kamikadze328.developerslife.data.*
 import com.kamikadze328.developerslife.databinding.FragmentMemBinding
 import com.kamikadze328.developerslife.ui.data.ImageDownloadProblemClickedListener
+import com.kamikadze328.developerslife.ui.data.MemOptions
 import jp.wasabeef.glide.transformations.BlurTransformation
 import okhttp3.Call
 import okhttp3.Callback
@@ -41,12 +42,11 @@ import org.json.JSONObject
 import java.io.IOException
 
 
-class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
+class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions {
     private var _binding: FragmentMemBinding? = null
     private val binding get() = _binding!!
 
-    private var category: Category? = null
-    var categoryNumber = 0
+    lateinit var category: Category
 
     private var internetProblemFragment = InternetProblemFragment()
     private var imageDownloadProblemFragment = ImageDownloadProblemFragment()
@@ -70,8 +70,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
     private var state: State = State.INIT
 
     companion object {
-        private const val ARG_SECTION_NUMBER = "section_number"
-        private const val ARG_SECTION_TITLE = "section_title"
+        private const val ARG_CATEGORY = "section_category"
 
         private const val CACHE_KEY = "cache"
         private const val STATE_KEY = "state"
@@ -80,12 +79,12 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
 
 
         @JvmStatic
-        fun newInstance(sectionNumber: Int, sectionTitle: String): MemFragment {
+        fun newInstance(category: Category): MemFragment {
             return MemFragment().apply {
                 arguments = Bundle().apply {
-                    putInt(ARG_SECTION_NUMBER, sectionNumber)
-                    putString(ARG_SECTION_TITLE, sectionTitle)
+                    putSerializable(ARG_CATEGORY, category)
                 }
+                this.category = category
             }
         }
     }
@@ -93,12 +92,12 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        categoryNumber = arguments?.getInt(ARG_SECTION_NUMBER) ?: 0
-        category = arguments?.getString(ARG_SECTION_TITLE)?.let {
-            Category.fromString(it) ?: category
-        } ?: Category.RANDOM
+        arguments?.let {
+            category = (it.getSerializable(ARG_CATEGORY) ?: Category.RANDOM) as Category
+        }
 
         if (savedInstanceState != null) {
+
             cache = savedInstanceState.getParcelableArrayList(toCategoryStr(CACHE_KEY)) ?: cache
             currentImageNumber = savedInstanceState.getInt(toCategoryStr(CURRENT_IMAGE_NUMBER_KEY))
             currentPage = savedInstanceState.getInt(toCategoryStr(CURRENT_PAGE_KEY))
@@ -235,7 +234,6 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     private fun isCurrentMemHasGif(): Boolean = currentMem.gifURL.isNotBlank()
-    private fun isMemHasGif(memNumber: Int): Boolean = cache[memNumber].gifURL.isNotBlank()
 
     private fun updateMemDescriptionText() {
         binding.memDescription.text = currentMem.description
@@ -264,9 +262,12 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
                     resource: Drawable,
                     transition: Transition<in Drawable>?
                 ) {
-                    Log.d("kek", "updateMemImageWithPreview resource ready($loadedMemNumber) id=${cache[loadedMemNumber].id}")
-                    if(currentImageNumber != loadedMemNumber) return
-                    if (isMemHasGif(loadedMemNumber)) updateMemGifImage(resource)
+                    Log.d(
+                        "kek",
+                        "updateMemImageWithPreview resource ready($loadedMemNumber) id=${cache[loadedMemNumber].id}"
+                    )
+                    if (currentImageNumber != loadedMemNumber) return
+                    if (isCurrentMemHasGif()) updateMemGifImage(resource)
                     else updateMemImage(resource)
                 }
 
@@ -465,7 +466,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
             .remove(fr).commitNow()
     }
 
-    fun nextImage() {
+    override fun next() {
         Log.d("kek", "next image click")
         if (cache.size != 0 && cache.size != currentImageNumber) currentImageNumber++
         if (cache.size > currentImageNumber) {
@@ -477,7 +478,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
         }
     }
 
-    fun prevImage() {
+    override fun prev() {
         if (currentImageNumber == 0) Toast.makeText(
             context,
             getString(R.string.first_image),
@@ -513,7 +514,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
                     } else processServerError()
                 }
             }
-        }, category ?: Category.RANDOM, currentPage)
+        }, category, currentPage)
     }
 
     private fun processDownloadMetaError() {
@@ -568,7 +569,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
         }
     }
 
-    fun shareImage() {
+    override fun share() {
         val curMem = currentMemSafe
         if (curMem == null)
             showSharingProblem()
@@ -623,7 +624,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
 
     private fun getFragmentTag(fr: Fragment) = "${fr.javaClass.simpleName}$currentPage"
 
-    private fun toCategoryStr(str: String) = str + categoryNumber.toString()
+    private fun toCategoryStr(str: String) = str + category.id.toString()
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -632,6 +633,21 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
 
     override fun imageDownloadProblemClicked() {
         updateFragmentState()
+    }
+
+    fun clearHistory() {
+        Log.d("kek", "clearHistory - added($isAdded")
+        if (!isAdded) return
+        if (category == Category.RANDOM && cache.isNotEmpty()) {
+            val last = cache.last()
+            cache.clear()
+            cache.add(last)
+            currentImageNumber = 0
+        } else {
+            currentImageNumber = 0
+            cache.clear()
+            getNewMem()
+        }
     }
 
 

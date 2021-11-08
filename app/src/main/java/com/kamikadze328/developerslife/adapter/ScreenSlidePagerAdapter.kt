@@ -18,11 +18,8 @@ class ScreenSlidePagerAdapter(
     override fun getItemCount(): Int = Category.values().size
 
     override fun createFragment(position: Int): Fragment {
-        val f = MemFragment.newInstance(
-            position + 1,
-            context.resources.getString(Category.values()[position].resourceId)
-        )
-        fragments.add(position, f)
+        val f = MemFragment.newInstance(Category.byId(position))
+        fragments.add(position, f)to
         return f
     }
 }

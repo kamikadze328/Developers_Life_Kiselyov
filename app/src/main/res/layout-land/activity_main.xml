@@ -10,14 +10,14 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="?actionBarSize"
         android:theme="@style/Theme.DevelopersLife.AppBarOverlay"
         app:layout_constraintTop_toTopOf="parent">
 
-
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
             android:background="?attr/colorPrimary" />
 
     </com.google.android.material.appbar.AppBarLayout>
