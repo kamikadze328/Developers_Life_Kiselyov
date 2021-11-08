@@ -10,7 +10,6 @@ import android.graphics.drawable.Drawable
 import android.net.*
 import android.net.ConnectivityManager.NetworkCallback
 import android.os.Bundle
-import android.os.Parcel
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -104,26 +103,8 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
             currentImageNumber = savedInstanceState.getInt(CURRENT_IMAGE_NUMBER_KEY)
             currentPage = savedInstanceState.getInt(CURRENT_PAGE_KEY)
             state = (savedInstanceState.getSerializable(STATE_KEY) ?: state) as State
-            Log.d(
-                "kek",
-                "size of cache(${cache.size}) - ${
-                    android.text.format.Formatter.formatFileSize(
-                        requireContext(),
-                        getBundleSizeInBytes(savedInstanceState)
-                    )
-                }"
-            )
         }
     }
-
-    fun getBundleSizeInBytes(bundle: Bundle): Long {
-        val parcel = Parcel.obtain()
-        parcel.writeValue(bundle)
-        val bytes = parcel.marshall()
-        parcel.recycle()
-        return bytes.size.toLong()
-    }
-
 
     private fun initState() {
         when (state) {

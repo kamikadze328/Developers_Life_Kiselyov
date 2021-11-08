@@ -19,7 +19,7 @@ class ScreenSlidePagerAdapter(
 
     override fun createFragment(position: Int): Fragment {
         val f = MemFragment.newInstance(Category.byId(position))
-        fragments.add(position, f)to
+        fragments.add(position, f)
         return f
     }
 }

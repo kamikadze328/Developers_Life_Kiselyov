@@ -7,7 +7,13 @@ import org.json.JSONObject
 
 
 @Parcelize
-data class ImageMeta(val description: String, val gifURL: String, val previewURL: String, val id: Int, val votes: Int) :
+data class ImageMeta(
+    val description: String,
+    val gifURL: String,
+    val previewURL: String,
+    val id: Int,
+    val votes: Int
+) :
     Parcelable {
     companion object {
         fun jsonObjectToImageMeta(json: JSONObject): ImageMeta {
