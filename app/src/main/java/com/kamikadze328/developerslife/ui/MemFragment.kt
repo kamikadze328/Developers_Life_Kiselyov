@@ -194,7 +194,11 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
                 val clip = ClipData.newPlainText("developerslive.ru", url)
                 clipboard.setPrimaryClip(clip)
 
-                Toast.makeText(requireContext(), getString(R.string.text_copied, url), Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.text_copied, url),
+                    Toast.LENGTH_LONG
+                ).show()
             }
             true
         }
@@ -231,6 +235,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     private fun isCurrentMemHasGif(): Boolean = currentMem.gifURL.isNotBlank()
+    private fun isMemHasGif(memNumber: Int): Boolean = cache[memNumber].gifURL.isNotBlank()
 
     private fun updateMemDescriptionText() {
         binding.memDescription.text = currentMem.description
@@ -250,6 +255,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
 
     private fun updateMemImageWithPreview() {
         showLoading()
+        val loadedMemNumber = currentImageNumber
         Glide.with(this)
             .load(currentMem.previewURL)
             .apply(RequestOptions.bitmapTransform(BlurTransformation(10)))
@@ -258,7 +264,9 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
                     resource: Drawable,
                     transition: Transition<in Drawable>?
                 ) {
-                    if (isCurrentMemHasGif()) updateMemGifImage(resource)
+                    Log.d("kek", "updateMemImageWithPreview resource ready($loadedMemNumber) id=${cache[loadedMemNumber].id}")
+                    if(currentImageNumber != loadedMemNumber) return
+                    if (isMemHasGif(loadedMemNumber)) updateMemGifImage(resource)
                     else updateMemImage(resource)
                 }
 
@@ -285,6 +293,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
                     hideAllProblemAndLoading()
                     resource?.start()
                     state = State.OK
+
                     return false
                 }
 
@@ -457,7 +466,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
     }
 
     fun nextImage() {
-        Log.d("kek", "next image")
+        Log.d("kek", "next image click")
         if (cache.size != 0 && cache.size != currentImageNumber) currentImageNumber++
         if (cache.size > currentImageNumber) {
             updateFragmentState()
@@ -585,10 +594,14 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
+                        var isOk = false
                         resource?.let { gif ->
-                            val uri = saveGif(gif, requireContext())
-                            shareCurrentGif(uri)
+                            saveGif(gif, requireContext())?.let { uri ->
+                                shareCurrentGif(uri, curMem.description)
+                                isOk = true
+                            }
                         }
+                        if (!isOk) showSharingProblem()
                         return false
                     }
                 })
@@ -597,11 +610,11 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener {
         }
     }
 
-    private fun shareCurrentGif(uri: Uri) {
+    private fun shareCurrentGif(uri: Uri, description: String) {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "image/gif"
             putExtra(Intent.EXTRA_STREAM, uri)
-            putExtra(Intent.EXTRA_TEXT, currentMem.description)
+            putExtra(Intent.EXTRA_TEXT, description)
         }
 
         startActivity(Intent.createChooser(shareIntent, null))

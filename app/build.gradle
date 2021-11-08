@@ -7,13 +7,13 @@ plugins {
 android {
     compileSdkVersion 31
     buildToolsVersion "30.0.3"
-    def code = 5
+    def code = 7
     defaultConfig {
         applicationId "com.kamikadze328.developerslife"
         minSdkVersion 23
         targetSdkVersion 31
         versionCode code
-        versionName "1.1"
+        versionName "1.21"
     }
 
     buildTypes {
