@@ -50,8 +50,6 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.clear_mem_history -> {
-                Log.d("kek", "clearAll - ${sectionsPagerAdapter.fragments.size}")
-
                 sectionsPagerAdapter.fragments.forEach {
                     it?.clearHistory()
                 }
@@ -62,7 +60,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupPagerAdapter() {
-        Log.d("kek", "setupPagerAdapter")
         sectionsPagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager, lifecycle, this)
         val viewPager: ViewPager2 = binding.viewPager
         val tabs: TabLayout = binding.tabs
@@ -77,7 +74,6 @@ class MainActivity : AppCompatActivity() {
         sectionsPagerAdapter.fragments.clear()
         supportFragmentManager.fragments.forEach {
             if (it is MemFragment) {
-                Log.d("kek", "added - ${it.category}")
                 sectionsPagerAdapter.fragments.add(it.category.id, it)
             }
         }

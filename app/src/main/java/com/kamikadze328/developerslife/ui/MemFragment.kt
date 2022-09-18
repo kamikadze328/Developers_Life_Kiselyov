@@ -10,7 +10,6 @@ import android.graphics.drawable.Drawable
 import android.net.*
 import android.net.ConnectivityManager.NetworkCallback
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,6 +33,8 @@ import com.kamikadze328.developerslife.data.*
 import com.kamikadze328.developerslife.databinding.FragmentMemBinding
 import com.kamikadze328.developerslife.ui.data.ImageDownloadProblemClickedListener
 import com.kamikadze328.developerslife.ui.data.MemOptions
+import com.kamikadze328.developerslife.utils.ActivityUtils.parcelableArrayList
+import com.kamikadze328.developerslife.utils.ActivityUtils.serializable
 import jp.wasabeef.glide.transformations.BlurTransformation
 import okhttp3.Call
 import okhttp3.Callback
@@ -42,7 +43,6 @@ import org.json.JSONObject
 import java.io.IOException
 
 
-private const val max_cache_size = 100
 
 class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions {
     private var _binding: FragmentMemBinding? = null
@@ -78,6 +78,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
         private const val STATE_KEY = "state"
         private const val CURRENT_IMAGE_NUMBER_KEY = "current_image_number"
         private const val CURRENT_PAGE_KEY = "current_page"
+        private const val MAX_CACHE_SIZE = 100
 
 
         @JvmStatic
@@ -93,16 +94,15 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         arguments?.let {
-            category = (it.getSerializable(ARG_CATEGORY) ?: Category.RANDOM) as Category
+            category = it.serializable(ARG_CATEGORY) ?: Category.RANDOM
         }
 
         if (savedInstanceState != null) {
-            cache = savedInstanceState.getParcelableArrayList(CACHE_KEY) ?: cache
+            cache = savedInstanceState.parcelableArrayList(CACHE_KEY) ?: cache
             currentImageNumber = savedInstanceState.getInt(CURRENT_IMAGE_NUMBER_KEY)
             currentPage = savedInstanceState.getInt(CURRENT_PAGE_KEY)
-            state = (savedInstanceState.getSerializable(STATE_KEY) ?: state) as State
+            state = savedInstanceState.serializable(STATE_KEY) ?: state
         }
     }
 
@@ -262,10 +262,6 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
                     resource: Drawable,
                     transition: Transition<in Drawable>?
                 ) {
-                    Log.d(
-                        "kek",
-                        "updateMemImageWithPreview resource ready($loadedMemNumber) id=${cache[loadedMemNumber].id}"
-                    )
                     if (currentImageNumber != loadedMemNumber) return
                     if (isCurrentMemHasGif()) updateMemGifImage(resource)
                     else updateMemImage(resource)
@@ -304,9 +300,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
                     target: Target<GifDrawable?>?,
                     isFirstResource: Boolean
                 ): Boolean {
-                    Log.d("kek", "${e?.toString()}")
                     e?.printStackTrace()
-                    Log.d("kek", "${e?.stackTraceToString()}")
 
                     showImageDownloadProblem()
                     return false
@@ -319,10 +313,6 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
     }
 
     fun updateFragmentState() {
-        Log.d("kek", "updateFragmentState")
-        Log.d("kek", "$currentImageNumber")
-        Log.d("kek", "${cache.size}")
-
         updateMemDescriptionText()
         updateMemRatingText()
         updateMemImageWithPreview()
@@ -345,7 +335,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
         binding.memRating.visibility = if (doHideRatings()) View.INVISIBLE else View.VISIBLE
     }
 
-    private fun doHideRatings() = PreferenceManager.getDefaultSharedPreferences(context)
+    private fun doHideRatings() = PreferenceManager.getDefaultSharedPreferences(requireContext())
         .getBoolean(resources.getString(R.string.hide_rating_key), false)
 
     private fun hideMemDescription() {
@@ -467,13 +457,11 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
     }
 
     override fun next() {
-        Log.d("kek", "next image click")
         if (cache.size != 0 && cache.size != currentImageNumber) currentImageNumber++
         if (cache.size > currentImageNumber) {
             updateFragmentState()
         } else {
             if (category != Category.RANDOM && cache.size != 0) currentPage++
-            Log.d("kek", "new mem image")
             getNewMem()
         }
     }
@@ -491,7 +479,6 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
     }
 
     private fun getNewMem() {
-        Log.d("kek", "getNewMem")
         hideMemDescriptionAndImage()
         showLoading()
         downloader.getData(object : Callback {
@@ -503,8 +490,8 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
 
             override fun onResponse(call: Call, response: Response) {
                 activity?.runOnUiThread {
-                    if (response.isSuccessful && response.body != null) {
-                        val jsonObj = JSONObject(response.body!!.string())
+                    if (response.isSuccessful) {
+                        val jsonObj = JSONObject(response.body.string())
                         if (!processResponse(jsonObj)) {
                             processInternetError()
                             return@runOnUiThread
@@ -540,9 +527,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
     }
 
     fun processResponse(json: JSONObject): Boolean {
-        Log.d("kek", "processResponse")
         if (category == Category.RANDOM) {
-            Log.d("kek", "${ImageMeta.jsonObjectToImageMeta(json)}")
             val imageMeta = ImageMeta.jsonObjectToImageMeta(json)
             if (imageMeta.gifURL.isEmpty()) return false
             return cache.safelyAdd(imageMeta)
@@ -635,7 +620,6 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
     }
 
     fun clearHistory() {
-        Log.d("kek", "clearHistory - added($isAdded")
         if (!isAdded) return
         if (category == Category.RANDOM && cache.isNotEmpty()) {
             val last = cache.last()
@@ -650,7 +634,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
     }
 
     private fun <T> ArrayList<T>.safelyAdd(element: T): Boolean {
-        if (size == max_cache_size) {
+        if (size == MAX_CACHE_SIZE) {
             removeAt(0)
             currentImageNumber--
         }

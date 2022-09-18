@@ -1,20 +1,17 @@
 <resources>
-
-    <style name="Widget.Theme.DevelopersLife.MyView" parent="">
-        <item name="android:background">@color/gray_400</item>
-    </style>
-
     <style name="MyImageButton" parent="">
         <item name="android:layout_margin">@dimen/button_margin</item>
         <item name="android:elevation">@dimen/button_elevation</item>
         <item name="android:background">@drawable/button_round</item>
     </style>
 
-    <style name="AboutTheme">
+    <style name="AboutThemeParent">
         <item name="android:textStyle">bold</item>
-        <item name="android:textColorLink">@color/design_default_color_primary</item>
-        <item name="android:textColor">@color/design_default_color_secondary</item>
+        <item name="android:textColorLink">@color/light_blue_600</item>
+        <item name="android:textColor">@color/dark</item>
         <item name="android:textSize">@dimen/about_text</item>
         <item name="android:layout_margin">20dp</item>
     </style>
+
+    <style name="AboutTheme" parent="AboutThemeParent" />
 </resources>

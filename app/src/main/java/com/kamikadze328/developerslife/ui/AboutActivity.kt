@@ -20,10 +20,6 @@ class AboutActivity : MenuActivity(R.layout.about_activity) {
         binding.privacyPolicyRef.movementMethod = LinkMovementMethod.getInstance()
         binding.githubRef.movementMethod = LinkMovementMethod.getInstance()
 
-        binding.appVersion.text = resources.getString(
-            R.string.app_version,
-            BuildConfig.VERSION_NAME,
-            BuildConfig.VERSION_CODE
-        )
+        binding.appVersion.text = resources.getString(R.string.app_version, BuildConfig.VERSION_NAME)
     }
 }

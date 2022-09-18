@@ -1,12 +1,14 @@
 <resources>
-
-    <style name="Theme.DevelopersLife" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryDark">@color/purple_700</item>
-        <item name="colorAccent">@color/teal_200</item>
+    <style name="Theme.DevelopersLife" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/main </item>
+        <item name="colorPrimaryDark">@color/main</item>
+        <item name="colorAccent">@color/light_blue_600</item>
     </style>
 
-    <style name="Theme.DevelopersLife.NoActionBar">
+    <style name="Theme.DevelopersLife.Main" parent="Theme.DevelopersLife"/>
+
+
+    <style name="Theme.DevelopersLife.NoActionBar" parent="Theme.DevelopersLife.Main">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
