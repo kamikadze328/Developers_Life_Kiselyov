@@ -2,10 +2,10 @@
 Completed test task for Tinkoff Summer School 2021
 ### Download:
 - [Google play](https://play.google.com/store/apps/details?id=com.kamikadze328.developerslife)  
-- [AppGalerry](https://appgallery.huawei.com/#/app/C104573145)  
+- [AppGallery](https://appgallery.huawei.com/#/app/C104573145)  
   
 ## Android app (Kotlin)
-![Developers life promoution image](https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/0_main_image.png)
+![Developers life promotion image](https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/0_main_image.png)
 <img alt="Mem 1 image" src="https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/1_mem_1.jpg" width="350">
 <img alt="Mem 2 image" src="https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/2_mem_2.jpg" width="350">
 <img alt="Mem 3 image" src="https://github.com/kamikadze328/Developers_Life/blob/main/images/Screenshots/3_mem_3.jpg" width="350">

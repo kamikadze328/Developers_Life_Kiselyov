@@ -1,9 +1,5 @@
 <resources>
     <string name="app_name">Developers Life</string>
-    <string name="random">Random</string>
-    <string name="latest">Latest</string>
-    <string name="top">Top</string>
-    <string name="hot">Hot</string>
 
     <string name="button_description_next_gif">Next mem</string>
     <string name="button_description_prev_gif">Previous mem</string>

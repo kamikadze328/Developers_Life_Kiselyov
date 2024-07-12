@@ -2,7 +2,6 @@ package com.kamikadze328.developerslife
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -66,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 
         viewPager.adapter = sectionsPagerAdapter
         TabLayoutMediator(tabs, viewPager) { tab, position ->
-            tab.text = "${Category.values()[(position)]}"
+            tab.text = "${Category.entries[(position)]}"
         }.attach()
 
 

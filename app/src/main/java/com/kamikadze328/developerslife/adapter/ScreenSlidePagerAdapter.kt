@@ -15,7 +15,7 @@ class ScreenSlidePagerAdapter(
 ) : FragmentStateAdapter(fragmentManager, lifecycle) {
 
     val fragments: MutableList<MemFragment?> = MutableList(itemCount) { null }
-    override fun getItemCount(): Int = Category.values().size
+    override fun getItemCount(): Int = Category.entries.size
 
     override fun createFragment(position: Int): Fragment {
         val f = MemFragment.newInstance(Category.byId(position))

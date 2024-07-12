@@ -47,14 +47,6 @@ data class ImageMeta(
             }
         }
 
-        private fun getBoolean(name: String, json: JSONObject): Boolean {
-            return try {
-                json.getBoolean(name)
-            } catch (e: JSONException) {
-                false
-            }
-        }
-
         private fun getInt(name: String, json: JSONObject): Int {
             return try {
                 json.getInt(name)
@@ -63,6 +55,4 @@ data class ImageMeta(
             }
         }
     }
-
-
 }

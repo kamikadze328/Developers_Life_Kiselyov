@@ -10,10 +10,6 @@
     <string name="internet_problem_description">Похоже, какие-то проблемы с интернетом</string>
     <string name="view_description_gif">текущий мем</string>
     <string name="button_description_prev_gif">Предыдущий мем</string>
-    <string name="hot">Горячие</string>
-    <string name="top">Лучшие</string>
-    <string name="latest">Последние</string>
-    <string name="random">Случайные</string>
     <string name="settings">Настройки</string>
     <string name="about">О приложении</string>
     <string name="clear_mem_history">Очистить историю</string>
@@ -27,5 +23,4 @@
     <string name="open">Открыть мем на developerslife.ru</string>
 
     <string name="text_copied">Ссылка (%1$s) скопирована</string>
-
 </resources>

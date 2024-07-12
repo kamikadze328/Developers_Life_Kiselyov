@@ -7,8 +7,12 @@ import android.content.Context.CONNECTIVITY_SERVICE
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
-import android.net.*
+import android.net.ConnectivityManager
 import android.net.ConnectivityManager.NetworkCallback
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,7 +33,11 @@ import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.kamikadze328.developerslife.App
 import com.kamikadze328.developerslife.R
-import com.kamikadze328.developerslife.data.*
+import com.kamikadze328.developerslife.data.Category
+import com.kamikadze328.developerslife.data.Downloader
+import com.kamikadze328.developerslife.data.ImageMeta
+import com.kamikadze328.developerslife.data.State
+import com.kamikadze328.developerslife.data.saveGif
 import com.kamikadze328.developerslife.databinding.FragmentMemBinding
 import com.kamikadze328.developerslife.ui.data.ImageDownloadProblemClickedListener
 import com.kamikadze328.developerslife.ui.data.MemOptions
@@ -41,7 +49,6 @@ import okhttp3.Callback
 import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
-
 
 
 class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions {
@@ -281,14 +288,14 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
             /*.onlyRetrieveFromCache(true)*/
             .listener(object : RequestListener<GifDrawable?> {
                 override fun onResourceReady(
-                    resource: GifDrawable?,
-                    model: Any?,
+                    resource: GifDrawable,
+                    model: Any,
                     target: Target<GifDrawable?>?,
-                    dataSource: DataSource?,
+                    dataSource: DataSource,
                     isFirstResource: Boolean
                 ): Boolean {
                     hideAllProblemAndLoading()
-                    resource?.start()
+                    resource.start()
                     state = State.OK
 
                     return false
@@ -297,7 +304,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
                 override fun onLoadFailed(
                     e: GlideException?,
                     model: Any?,
-                    target: Target<GifDrawable?>?,
+                    target: Target<GifDrawable?>,
                     isFirstResource: Boolean
                 ): Boolean {
                     e?.printStackTrace()
@@ -448,12 +455,13 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
     private fun addFragment(fr: Fragment) {
         childFragmentManager.beginTransaction()
             .add(R.id.memFragment, fr, getFragmentTag(fr))
-            .commitNow()
+            .commitAllowingStateLoss()
     }
 
     private fun removeFragment(fr: Fragment) {
         childFragmentManager.beginTransaction()
-            .remove(fr).commitNow()
+            .remove(fr)
+            .commitAllowingStateLoss()
     }
 
     override fun next() {
@@ -490,14 +498,18 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
 
             override fun onResponse(call: Call, response: Response) {
                 activity?.runOnUiThread {
-                    if (response.isSuccessful) {
-                        val jsonObj = JSONObject(response.body.string())
-                        if (!processResponse(jsonObj)) {
-                            processInternetError()
-                            return@runOnUiThread
+                    if (response.isSuccessful && response.body.string().isNotBlank()) {
+                        try {
+                            val jsonObj = JSONObject(response.body.string())
+                            if (!processResponse(jsonObj)) {
+                                processInternetError()
+                                return@runOnUiThread
+                            }
+                            if (cache.size > 0) updateFragmentState()
+                            else processNoImagesErrorMeta()
+                        } catch (jsonException: Throwable) {
+                            processServerError()
                         }
-                        if (cache.size > 0) updateFragmentState()
-                        else processNoImagesErrorMeta()
                     } else processServerError()
                 }
             }
@@ -567,7 +579,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
                     override fun onLoadFailed(
                         e: GlideException?,
                         model: Any?,
-                        target: Target<GifDrawable>?,
+                        target: Target<GifDrawable>,
                         isFirstResource: Boolean
                     ): Boolean {
                         showSharingProblem(true)
@@ -575,19 +587,18 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
                     }
 
                     override fun onResourceReady(
-                        resource: GifDrawable?,
-                        model: Any?,
+                        resource: GifDrawable,
+                        model: Any,
                         target: Target<GifDrawable>?,
-                        dataSource: DataSource?,
+                        dataSource: DataSource,
                         isFirstResource: Boolean
                     ): Boolean {
                         var isOk = false
-                        resource?.let { gif ->
-                            saveGif(gif, requireContext())?.let { uri ->
-                                shareCurrentGif(uri, curMem.description)
-                                isOk = true
-                            }
+                        saveGif(resource, requireContext())?.let { uri ->
+                            shareCurrentGif(uri, curMem.description)
+                            isOk = true
                         }
+
                         if (!isOk) showSharingProblem()
                         return false
                     }

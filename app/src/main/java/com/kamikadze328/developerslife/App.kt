@@ -5,5 +5,4 @@ import com.kamikadze328.developerslife.data.Downloader
 
 class App : Application() {
     val downloader by lazy { Downloader() }
-
 }
