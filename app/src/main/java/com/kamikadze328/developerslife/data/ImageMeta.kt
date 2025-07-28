@@ -1,20 +1,18 @@
 package com.kamikadze328.developerslife.data
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 import org.json.JSONException
 import org.json.JSONObject
 
 
-@Parcelize
+@Serializable
 data class ImageMeta(
     val description: String,
     val gifURL: String,
     val previewURL: String,
     val id: Int,
     val votes: Int
-) :
-    Parcelable {
+) {
     companion object {
         fun jsonObjectToImageMeta(json: JSONObject): ImageMeta {
             val description = getString("description", json)

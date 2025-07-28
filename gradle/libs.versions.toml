@@ -1,0 +1,36 @@
+[versions]
+agp = "8.11.1"
+androidx-appcompat = "1.7.1"
+androidx-constraintlayout = "2.2.1"
+androidx-legacy-support-core-utils = "1.0.0"
+androidx-legacy-support-v4 = "1.0.0"
+androidx-lifecycle-viewmodel-ktx = "2.9.2"
+androidx-preference-ktx = "1.2.1"
+glide = "4.16.0"
+kotlin = "2.2.0"
+kotlinx-coroutines = "1.8.1"
+kotlinx-serialization = "1.7.0"
+material = "1.12.0"
+okhttp3 = "5.1.0"
+wasabeef-glide-transformations = "4.3.0"
+
+[libraries]
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
+androidx-legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "androidx-legacy-support-v4" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
+androidx-legacy-support-core-utils = { group = "androidx.legacy", name = "legacy-support-core-utils", version.ref = "androidx-legacy-support-core-utils" }
+androidx-preference-ktx = { group = "androidx.preference", name = "preference-ktx", version.ref = "androidx-preference-ktx" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle-viewmodel-ktx" }
+okhttp3-okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp3" }
+glide-glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+glide-compiler = { group = "com.github.bumptech.glide", name = "compiler", version.ref = "glide" }
+wasabeef-glide-transformations = { group = "jp.wasabeef", name = "glide-transformations", version.ref = "wasabeef-glide-transformations" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

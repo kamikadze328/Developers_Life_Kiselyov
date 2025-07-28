@@ -21,7 +21,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -41,14 +40,16 @@ import com.kamikadze328.developerslife.data.saveGif
 import com.kamikadze328.developerslife.databinding.FragmentMemBinding
 import com.kamikadze328.developerslife.ui.data.ImageDownloadProblemClickedListener
 import com.kamikadze328.developerslife.ui.data.MemOptions
-import com.kamikadze328.developerslife.utils.ActivityUtils.parcelableArrayList
-import com.kamikadze328.developerslife.utils.ActivityUtils.serializable
 import jp.wasabeef.glide.transformations.BlurTransformation
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
+import androidx.core.net.toUri
+import androidx.core.os.BundleCompat
+import androidx.preference.PreferenceManager
+import androidx.core.view.isVisible
 
 
 class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions {
@@ -69,7 +70,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
     private val currentMemSafe: ImageMeta?
         get() = try {
             currentMem
-        } catch (e: IndexOutOfBoundsException) {
+        } catch (_: IndexOutOfBoundsException) {
             null
         }
 
@@ -102,14 +103,14 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            category = it.serializable(ARG_CATEGORY) ?: Category.RANDOM
+            category = BundleCompat.getSerializable(it, ARG_CATEGORY, Category::class.java)
+                ?: Category.RANDOM
         }
-
         if (savedInstanceState != null) {
-            cache = savedInstanceState.parcelableArrayList(CACHE_KEY) ?: cache
+            cache = BundleCompat.getSerializable(savedInstanceState, CACHE_KEY, ArrayList<ImageMeta>()::class.java) ?: cache
             currentImageNumber = savedInstanceState.getInt(CURRENT_IMAGE_NUMBER_KEY)
             currentPage = savedInstanceState.getInt(CURRENT_PAGE_KEY)
-            state = savedInstanceState.serializable(STATE_KEY) ?: state
+            state = BundleCompat.getSerializable(savedInstanceState, STATE_KEY, State::class.java) ?: state
         }
     }
 
@@ -164,7 +165,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
     }
 
     private fun setupRatingVisibility() {
-        if (binding.memRating.visibility == View.VISIBLE && doHideRatings())
+        if (binding.memRating.isVisible && doHideRatings())
             binding.memRating.visibility = View.INVISIBLE
         else if (binding.memRating.visibility != View.VISIBLE && !doHideRatings() && state == State.OK)
             binding.memRating.visibility = View.VISIBLE
@@ -188,7 +189,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
         binding.open.setOnClickListener {
             currentMemSafe?.let {
                 val url = downloader.getMemUrl(it.id)
-                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                val browserIntent = Intent(Intent.ACTION_VIEW, url.toUri())
                 startActivity(browserIntent)
             }
         }
@@ -214,7 +215,7 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt(CURRENT_IMAGE_NUMBER_KEY, currentImageNumber)
         outState.putInt(CURRENT_PAGE_KEY, currentPage)
-        outState.putParcelableArrayList(CACHE_KEY, cache)
+        outState.putSerializable(CACHE_KEY, cache)
         outState.putSerializable(STATE_KEY, state)
         super.onSaveInstanceState(outState)
     }
@@ -465,11 +466,11 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
     }
 
     override fun next() {
-        if (cache.size != 0 && cache.size != currentImageNumber) currentImageNumber++
+        if (cache.isNotEmpty() && cache.size != currentImageNumber) currentImageNumber++
         if (cache.size > currentImageNumber) {
             updateFragmentState()
         } else {
-            if (category != Category.RANDOM && cache.size != 0) currentPage++
+            if (category != Category.RANDOM && cache.isNotEmpty()) currentPage++
             getNewMem()
         }
     }
@@ -505,9 +506,9 @@ class MemFragment : Fragment(), ImageDownloadProblemClickedListener, MemOptions 
                                 processInternetError()
                                 return@runOnUiThread
                             }
-                            if (cache.size > 0) updateFragmentState()
+                            if (cache.isNotEmpty()) updateFragmentState()
                             else processNoImagesErrorMeta()
-                        } catch (jsonException: Throwable) {
+                        } catch (_: Throwable) {
                             processServerError()
                         }
                     } else processServerError()

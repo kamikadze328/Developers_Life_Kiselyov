@@ -1,5 +1,8 @@
 package com.kamikadze328.developerslife.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class State {
     INIT,
     LOADING,
